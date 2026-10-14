@@ -3,6 +3,8 @@ class Components::Layout < Components::Base
   include Phlex::Rails::Helpers::CSPMetaTag
   include Phlex::Rails::Helpers::StyleSheetLinkTag
   include Phlex::Rails::Helpers::JavaScriptImportmapTags
+  include Phlex::Rails::Helpers::ButtonTo
+  include Phlex::Rails::Helpers::Flash
 
   def initialize(title:)
     @title = title
@@ -30,8 +32,32 @@ class Components::Layout < Components::Base
       end
 
       body do
-        main(class: "container mx-auto mt-28 px-5 flex", &)
+        header(class: "container mx-auto flex justify-end px-5 py-4") do
+          if Current.session
+            button_to "Sign out", session_path, method: :delete, class: "cursor-pointer text-sm text-gray-700 underline hover:no-underline"
+          end
+        end
+
+        flash_messages
+        main(class: "container mx-auto mt-16 px-5 flex", &)
       end
+    end
+  end
+
+  FLASH_STYLES = {
+    "alert" => {role: "alert", class: "rounded-lg bg-red-50 px-3 py-2 font-medium text-red-600"},
+    "notice" => {role: "status", class: "rounded-lg bg-green-50 px-3 py-2 font-medium text-green-600"}
+  }.freeze
+  private_constant :FLASH_STYLES
+
+  private
+
+  def flash_messages
+    messages = flash.to_hash.slice(*FLASH_STYLES.keys)
+    return if messages.empty?
+
+    div(class: "container mx-auto mt-4 px-5 space-y-2") do
+      messages.each { |type, message| p(**FLASH_STYLES[type]) { message } }
     end
   end
 end
