@@ -9,13 +9,11 @@ argument-hint: <issue number>
 Once the plan is approved, work autonomously. Don't ask for step-by-step confirmation.
 
 1. Read the issue with `gh issue view <n>`. Stop if it isn't `planned` (suggest `/plan-issue`), or if an issue under "Depends on" is still open (report which ones).
-2. Create the worktree from the current `origin/main`:
+2. Call `EnterWorktree` with name `<n>-<slug>`. It branches from `origin/main`, copies the files listed in `.worktreeinclude`, and moves the session into the worktree. Then, inside it:
 
    ```sh
-   git fetch origin
-   git worktree add .claude/worktrees/<n>-<slug> -b <n>-<slug> origin/main
-   cp config/master.key .claude/worktrees/<n>-<slug>/config/
-   cd .claude/worktrees/<n>-<slug> && bin/setup --skip-server
+   git branch -m <n>-<slug>
+   bin/setup --skip-server
    ```
 
 3. Implement test-first, with logical commits.
