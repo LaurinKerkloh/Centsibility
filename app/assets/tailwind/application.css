@@ -1,1 +1,22 @@
 @import "tailwindcss";
+
+@theme {
+  --color-background: var(--color-zinc-950);
+  --color-surface: var(--color-zinc-900);
+  --color-border: var(--color-zinc-700);
+  --color-text: var(--color-zinc-100);
+  --color-muted: var(--color-zinc-400);
+  --color-primary: var(--color-emerald-500);
+  --color-primary-hover: var(--color-emerald-400);
+  --color-danger: var(--color-rose-500);
+  --color-danger-hover: var(--color-rose-400);
+  --color-info: var(--color-sky-400);
+  --color-success: var(--color-emerald-400);
+  --color-warning: var(--color-amber-400);
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+}
