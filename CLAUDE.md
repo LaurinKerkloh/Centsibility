@@ -6,9 +6,7 @@ Personal finance app: import bank CSV exports (DKB for now), categorise transact
 
 - Ruby 3.4.9, Rails 8.1, SQLite
 - Hotwire (Turbo + Stimulus), importmap, Tailwind
-- Phlex for views and components
-- Oaken for fixtures and seeds
-- RSpec for tests
+- Phlex for views and components, Oaken for fixtures and seeds, RSpec for tests (all being set up in #20; Minitest until then)
 - Solid Queue, Solid Cache, Solid Cable
 - Kamal for deployment
 
@@ -16,9 +14,9 @@ Personal finance app: import bank CSV exports (DKB for now), categorise transact
 
 - `bin/setup` – install dependencies and prepare the database
 - `bin/dev` – run the app with the Tailwind watcher
-- `bundle exec rspec [path:line]` – run specs
+- `bin/rails test [path:line]` – run tests (`bundle exec rspec [path:line]` after #20)
 - `bin/rubocop [-a]` – lint (and autocorrect)
-- `bin/ci` – full local CI (setup, lint, audits, Brakeman, tests, seeds)
+- `bin/ci` – full local CI, steps in `config/ci.rb`
 
 ## Workflow
 

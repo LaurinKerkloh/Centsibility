@@ -6,13 +6,13 @@ argument-hint: <issue number>
 
 # Plan issue
 
-The goal is a fully shared understanding of the issue and the solution. Never fill gaps with your own assumptions.
+The goal is a fully shared understanding of the issue and the solution.
 
 1. Read the issue with `gh issue view <n>`. If it is already `planned`, ask whether to revise the plan or abort.
 2. **Ask first:** ask about intent and expected behaviour, in rounds of multiple-choice questions with a recommendation where there is one.
 3. **Investigate later:** read the relevant code and related issues, run checks, share the findings, then ask follow-up rounds.
-4. Repeat until a plan can be written without any assumptions.
-5. Show the full new issue body in the chat. Only after the user's OK, rewrite the body (`gh issue edit <n> --body-file`) and swap the labels (`--remove-label needs-plan --add-label planned`).
+4. Repeat until a plan can be written without any assumptions. Never fill gaps yourself.
+5. Show the full new issue body in the chat. Only after the user's OK, rewrite the body and swap the labels in one call: `gh issue edit <n> --body-file <file> --remove-label needs-plan --add-label planned`.
 
 ## Body format
 
