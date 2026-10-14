@@ -50,4 +50,8 @@ Rails.application.configure do
 
   # Raise error when a before_action's only/except options reference missing actions.
   config.action_controller.raise_on_missing_callback_actions = true
+
+  config.lookbook.preview_paths = [Rails.root.join("spec/components/previews")]
+  # Rails calls the layout proc with arguments, which a lambda rejects
+  config.lookbook.preview_layout = proc { Components::PreviewLayout }
 end
