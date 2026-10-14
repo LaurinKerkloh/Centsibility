@@ -16,7 +16,7 @@ class Components::Alert < Components::Base
       class: "flex items-start gap-3 rounded-md border border-border bg-surface px-4 py-3 text-sm",
       data: {controller: "alert", alert_timeout_value: @kind[:timeout]}
     ) do
-      p(class: "flex-1 font-medium #{@kind[:color]}", &)
+      div(class: "flex-1 font-medium #{@kind[:color]}", &)
       button(
         type: "button",
         aria_label: "Dismiss",

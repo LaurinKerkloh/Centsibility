@@ -13,5 +13,5 @@ Rails.application.routes.draw do
 
   root "home#index"
 
-  mount Lookbook::Engine, at: "/lookbook" if Rails.env.local?
+  mount Lookbook::Engine, at: "/lookbook" if defined?(Lookbook)
 end

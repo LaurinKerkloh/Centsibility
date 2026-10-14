@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@theme {
+@theme inline {
   --color-background: var(--color-zinc-950);
   --color-surface: var(--color-zinc-900);
   --color-border: var(--color-zinc-700);

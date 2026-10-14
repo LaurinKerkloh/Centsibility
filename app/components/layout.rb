@@ -57,7 +57,7 @@ class Components::Layout < Components::Base
     messages = flash.to_hash.slice(*FLASH_KINDS.keys)
     return if messages.empty?
 
-    div(class: "container mx-auto mt-4 px-5 space-y-2") do
+    div(class: "container mx-auto mt-4 px-5 space-y-2 empty:hidden") do
       messages.each do |key, message|
         render Components::Alert.new(kind: FLASH_KINDS[key]) { message }
       end

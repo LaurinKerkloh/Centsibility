@@ -20,6 +20,12 @@ RSpec.describe Components::Alert do
     end
   end
 
+  it "accepts block-level content" do
+    rendered = render(described_class.new(kind: :error)) { "<ul><li>Row 3 is invalid</li></ul>".html_safe }
+
+    expect(rendered).to have_css("[role='alert'] div.text-danger ul li", text: "Row 3 is invalid")
+  end
+
   it "has a close button" do
     rendered = render(described_class.new) { "Hello" }
 

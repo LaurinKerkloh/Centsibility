@@ -50,6 +50,21 @@ RSpec.describe Components::Form do
     expect(rendered).to have_field("CSV file", type: "file")
   end
 
+  it "passes Rails select options to the builder and the rest to the select", :aggregate_failures do
+    rendered = render(described_class.new(url: "/rules")) do |form|
+      form.select :kind, %w[income spending], label: "Kind", include_blank: true, selected: "spending", required: true
+    end
+
+    expect(rendered).to have_select("Kind", options: ["", "income", "spending"], selected: "spending")
+    expect(rendered).to have_css("select[required]:not([include_blank])")
+  end
+
+  it "adds extra classes to its own" do
+    rendered = render(described_class.new(url: "/rules", class: "mt-4")) { |form| form.submit "Save" }
+
+    expect(rendered).to have_css("form.space-y-5.mt-4")
+  end
+
   it "renders the secondary submit variant" do
     rendered = render(described_class.new(url: "/rules")) { |form| form.submit "Preview", variant: :secondary }
 

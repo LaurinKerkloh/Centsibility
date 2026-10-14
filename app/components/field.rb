@@ -6,11 +6,12 @@ class Components::Field < Components::Base
     @name = name
     @label = label
     @attributes = attributes
+    @id = attributes.fetch(:id) { form.field_id(name) }
   end
 
   def view_template
     div do
-      @form.label @name, @label, class: "block text-sm font-medium"
+      @form.label @name, @label, for: @id, class: "block text-sm font-medium"
       yield mix(input_attributes, @attributes)
 
       if errors.any?
@@ -35,5 +36,5 @@ class Components::Field < Components::Base
     @errors ||= @form.object&.errors&.full_messages_for(@name) || []
   end
 
-  def errors_id = @form.field_id(@name, :errors)
+  def errors_id = "#{@id}_errors"
 end

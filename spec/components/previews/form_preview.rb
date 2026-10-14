@@ -27,11 +27,12 @@ class FormPreview < Lookbook::Preview
   # @param error text
   # @param submit_variant select [primary, secondary, danger]
   def playground(input: :text_field, label: "Email address", error: "", submit_variant: :primary)
+    input = Components::Form::INPUTS.find { it.to_s == input.to_s } || :text_field
     user = User.new
     user.errors.add(:email_address, error) if error.present?
 
     render Components::Form.new(model: user, url: "#") do |form|
-      form.public_send(input.to_sym, :email_address, label:)
+      form.public_send(input, :email_address, label:)
       form.submit "Save", variant: submit_variant.to_sym
     end
   end
