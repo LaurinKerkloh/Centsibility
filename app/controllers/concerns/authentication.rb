@@ -28,8 +28,8 @@ module Authentication
   end
 
   def request_authentication
-    # Only GETs can be replayed by a redirect; returning to e.g. DELETE /session would hit a missing action.
-    session[:return_to_after_authenticating] = request.url if request.get?
+    # Only GET and HEAD can be replayed by a redirect; returning to e.g. DELETE /session would hit a missing action.
+    session[:return_to_after_authenticating] = request.url if request.get? || request.head?
     redirect_to new_session_path
   end
 
