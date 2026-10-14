@@ -1,24 +1,14 @@
-# README
+# Banking
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Personal finance app: import bank CSV exports, categorise transactions by rules, and analyse income and spending. Single user, self-hosted.
 
-Things you may want to cover:
+## The user
 
-* Ruby version
+There is no sign-up. Create the user, or change its password, from the Rails console (`kamal console` in production, `bin/rails console` locally):
 
-* System dependencies
+```ruby
+User.create!(email_address: "me@example.com", password: "...")
+User.find_by!(email_address: "me@example.com").update!(password: "...")
+```
 
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+In development, the seeds create `user@example.com` with the password `password`.
