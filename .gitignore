@@ -39,7 +39,7 @@
 
 *.csv
 *.CSV
-!/test/fixtures/files/**/*.csv
-!/test/fixtures/files/**/*.CSV
+!/spec/fixtures/files/**/*.csv
+!/spec/fixtures/files/**/*.CSV
 
 /.claude/worktrees/
