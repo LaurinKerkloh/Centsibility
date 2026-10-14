@@ -9,7 +9,7 @@ argument-hint: <issue number>
 Once the plan is approved, work autonomously. Don't ask for step-by-step confirmation.
 
 1. Read the issue with `gh issue view <n>`. Stop if it isn't `planned` (suggest `/plan-issue`), or if an issue under "Depends on" is still open (report which ones).
-2. Call `EnterWorktree` with name `<n>-<slug>`. It branches from `origin/main`, copies the files listed in `.worktreeinclude`, and moves the session into the worktree. Then, inside it:
+2. Call `EnterWorktree`. It branches from `origin/main`, copies the files listed in `.worktreeinclude`, and moves the session into the worktree. Then, inside it, name the branch `<n>-<slug>` and set up:
 
    ```sh
    git branch -m <n>-<slug>
