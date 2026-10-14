@@ -1,4 +1,8 @@
 plugins:
+  - rubocop-rspec
+  - rubocop-rspec_rails
+  - rubocop-capybara
+  - rubocop-factory_bot
   - standard-custom
   - standard-performance
   - standard-rails
@@ -7,79 +11,7 @@ plugins:
 inherit_gem:
   standard: config/base.yml
 
-# Mirror the standardrb CLI: pending cops stay off, and the rubocop-rspec, rubocop-rspec_rails and
-# rubocop-capybara extensions RuboCop suggests are already loaded through standard-rspec.
+# standard-rspec only overrides part of the rspec, rspec_rails, capybara and factory_bot configs, so their
+# defaults are loaded first as plugins. Cops the defaults mark pending stay off, like under the standardrb CLI.
 AllCops:
   NewCops: disable
-  SuggestExtensions: false
-
-# standard-rspec 0.5.1 predates these cops and leaves them unconfigured, so RuboCop runs them without
-# their default settings and some of them crash.
-Capybara/AmbiguousClick:
-  Enabled: false
-
-Capybara/AssertStyle:
-  Enabled: false
-
-Capybara/ClickLinkOrButtonStyle:
-  Enabled: false
-
-Capybara/FindAllFirst:
-  Enabled: false
-
-Capybara/RedundantWithinFind:
-  Enabled: false
-
-Capybara/RSpec/HaveContent:
-  Enabled: false
-
-Capybara/RSpec/HaveSelector:
-  Enabled: false
-
-Capybara/RSpec/MatchStyle:
-  Enabled: false
-
-Capybara/RSpec/NegationMatcher:
-  Enabled: false
-
-Capybara/RSpec/NegationMatcherAfterVisit:
-  Enabled: false
-
-Capybara/RSpec/PredicateMatcher:
-  Enabled: false
-
-Capybara/RSpec/SpecificMatcher:
-  Enabled: false
-
-Capybara/SpecificActions:
-  Enabled: false
-
-Capybara/SpecificFinders:
-  Enabled: false
-
-RSpec/DiscardedMatcher:
-  Enabled: false
-
-RSpec/MatchWithSimpleRegex:
-  Enabled: false
-
-RSpecRails/FileFixture:
-  Enabled: false
-
-RSpecRails/HaveHttpStatus:
-  Enabled: false
-
-RSpecRails/HttpStatusNameConsistency:
-  Enabled: false
-
-RSpecRails/InferredSpecType:
-  Enabled: false
-
-RSpecRails/MinitestAssertions:
-  Enabled: false
-
-RSpecRails/ReceivePerformLater:
-  Enabled: false
-
-RSpecRails/TravelAround:
-  Enabled: false
