@@ -20,13 +20,23 @@ RSpec.describe Components::Layout do
     expect(rendered).to have_css("header form[action='/session'] button.border-border", text: "Sign out")
   end
 
-  it "renders flash messages as alerts of the mapped kind", :aggregate_failures do
-    rendered = render_with_flash(notice: "Saved", alert: "Failed", info: "FYI", warning: "Careful", other: "Hidden")
+  it "renders notice and alert flashes as success and error alerts", :aggregate_failures do
+    rendered = render_with_flash(notice: "Saved", alert: "Failed")
 
     expect(rendered).to have_css("[role='status'] .text-success", text: "Saved")
     expect(rendered).to have_css("[role='alert'] .text-danger", text: "Failed")
+  end
+
+  it "renders info and warning flashes as alerts of the same kind", :aggregate_failures do
+    rendered = render_with_flash(info: "FYI", warning: "Careful")
+
     expect(rendered).to have_css("[role='status'] .text-info", text: "FYI")
     expect(rendered).to have_css("[role='alert'] .text-warning", text: "Careful")
+  end
+
+  it "ignores other flash keys" do
+    rendered = render_with_flash(other: "Hidden")
+
     expect(rendered).to have_no_text("Hidden")
   end
 
