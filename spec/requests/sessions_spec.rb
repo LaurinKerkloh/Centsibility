@@ -22,12 +22,19 @@ RSpec.describe "Sessions" do
   end
 
   it "signs in and returns to the requested page", :aggregate_failures do
-    get root_path
+    get root_path(from: "bookmark")
+    sign_in_as users.user
+
+    expect(response).to redirect_to(root_url(from: "bookmark"))
+    follow_redirect!
+    expect(response.body).to have_css("form[action='#{session_path}'] button", text: "Sign out")
+  end
+
+  it "does not return to a non-GET request after signing in" do
+    delete session_path
     sign_in_as users.user
 
     expect(response).to redirect_to(root_url)
-    follow_redirect!
-    expect(response.body).to have_css("form[action='#{session_path}'] button", text: "Sign out")
   end
 
   it "rejects invalid credentials with an alert", :aggregate_failures do

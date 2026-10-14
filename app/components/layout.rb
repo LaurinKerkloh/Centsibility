@@ -44,12 +44,13 @@ class Components::Layout < Components::Base
     end
   end
 
-  private
-
   FLASH_STYLES = {
     "alert" => {role: "alert", class: "rounded-lg bg-red-50 px-3 py-2 font-medium text-red-600"},
     "notice" => {role: "status", class: "rounded-lg bg-green-50 px-3 py-2 font-medium text-green-600"}
   }.freeze
+  private_constant :FLASH_STYLES
+
+  private
 
   def flash_messages
     messages = flash.to_hash.slice(*FLASH_STYLES.keys)

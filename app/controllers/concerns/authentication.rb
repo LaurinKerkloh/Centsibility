@@ -5,7 +5,6 @@ module Authentication
     # Resumed even where authentication is skipped, so the layout knows who is signed in on every page.
     before_action :resume_session
     before_action :require_authentication
-    helper_method :authenticated?
   end
 
   class_methods do
@@ -16,12 +15,8 @@ module Authentication
 
   private
 
-  def authenticated?
-    resume_session
-  end
-
   def require_authentication
-    resume_session || request_authentication
+    Current.session || request_authentication
   end
 
   def resume_session
@@ -33,7 +28,8 @@ module Authentication
   end
 
   def request_authentication
-    session[:return_to_after_authenticating] = request.url
+    # Only GETs can be replayed by a redirect; returning to e.g. DELETE /session would hit a missing action.
+    session[:return_to_after_authenticating] = request.url if request.get?
     redirect_to new_session_path
   end
 
