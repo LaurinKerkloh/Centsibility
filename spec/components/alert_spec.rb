@@ -1,15 +1,14 @@
 RSpec.describe Components::Alert do
-  it "renders an info alert by default that dismisses itself", :aggregate_failures do
-    rendered = render(described_class.new) { "Import started" }
-
-    expect(rendered).to have_css("[role='status'][data-controller='alert'][data-alert-timeout-value='5000']", text: "Import started")
-    expect(rendered).to have_css(".text-info")
+  it "renders info alerts by default" do
+    expect(render(described_class.new) { "Import started" }).to have_css("[role='status'] .text-info", text: "Import started")
   end
 
-  it "renders success alerts as a status that dismisses itself" do
-    rendered = render(described_class.new(kind: :success)) { "Saved" }
+  it "renders info and success alerts as a status that dismisses itself" do
+    {info: "text-info", success: "text-success"}.each do |kind, color|
+      rendered = render(described_class.new(kind:)) { "Saved" }
 
-    expect(rendered).to have_css("[role='status'][data-alert-timeout-value='5000'] .text-success", text: "Saved")
+      expect(rendered).to have_css("[role='status'][data-controller='alert'][data-alert-timeout-value='5000'] .#{color}", text: "Saved")
+    end
   end
 
   it "renders warning and error alerts as alerts that stay", :aggregate_failures do

@@ -1,7 +1,8 @@
 module ComponentHelpers
-  def render(component, &)
+  def render(component, flash: {}, &)
     controller = ApplicationController.new
     controller.request = ActionDispatch::TestRequest.create
+    flash.each { |key, message| controller.flash[key] = message }
     Capybara.string(component.render_in(controller.view_context, &))
   end
 end

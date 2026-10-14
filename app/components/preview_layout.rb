@@ -13,7 +13,7 @@ class Components::PreviewLayout < Components::Base
         javascript_importmap_tags
       end
 
-      body(class: "bg-background p-6 text-text", &)
+      body(class: "p-6", &)
     end
   end
 end

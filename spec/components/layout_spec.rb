@@ -21,29 +21,22 @@ RSpec.describe Components::Layout do
   end
 
   it "renders notice and alert flashes as success and error alerts", :aggregate_failures do
-    rendered = render_with_flash(notice: "Saved", alert: "Failed")
+    rendered = render(described_class.new(title: "Home"), flash: {notice: "Saved", alert: "Failed"})
 
     expect(rendered).to have_css("[role='status'] .text-success", text: "Saved")
     expect(rendered).to have_css("[role='alert'] .text-danger", text: "Failed")
   end
 
   it "renders info and warning flashes as alerts of the same kind", :aggregate_failures do
-    rendered = render_with_flash(info: "FYI", warning: "Careful")
+    rendered = render(described_class.new(title: "Home"), flash: {info: "FYI", warning: "Careful"})
 
     expect(rendered).to have_css("[role='status'] .text-info", text: "FYI")
     expect(rendered).to have_css("[role='alert'] .text-warning", text: "Careful")
   end
 
   it "ignores other flash keys" do
-    rendered = render_with_flash(other: "Hidden")
+    rendered = render(described_class.new(title: "Home"), flash: {other: "Hidden"})
 
     expect(rendered).to have_no_text("Hidden")
-  end
-
-  def render_with_flash(**messages)
-    controller = ApplicationController.new
-    controller.request = ActionDispatch::TestRequest.create
-    messages.each { |key, message| controller.flash[key] = message }
-    Capybara.string(described_class.new(title: "Home").render_in(controller.view_context))
   end
 end

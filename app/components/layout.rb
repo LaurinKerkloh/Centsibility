@@ -30,7 +30,7 @@ class Components::Layout < Components::Base
         javascript_importmap_tags
       end
 
-      body(class: "min-h-screen bg-background text-text") do
+      body do
         header(class: "container mx-auto flex justify-end px-5 py-4") do
           if Current.session
             render Components::Button.new(variant: :secondary, href: session_path, method: :delete) { "Sign out" }

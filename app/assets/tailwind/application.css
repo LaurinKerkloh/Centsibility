@@ -18,5 +18,7 @@
 @layer base {
   html {
     color-scheme: dark;
+    background-color: var(--color-background);
+    color: var(--color-text);
   }
 }

@@ -11,11 +11,11 @@ RSpec.describe "Lookbook" do
 
   Lookbook.previews.each do |preview|
     preview.scenarios.each do |scenario|
-      it "renders #{preview.name}/#{scenario.name} in the dark theme", :aggregate_failures do
+      it "renders #{preview.name}/#{scenario.name} with the app stylesheet", :aggregate_failures do
         get scenario.preview_path
 
         expect(response).to have_http_status(:ok)
-        expect(response.body).to include("bg-background")
+        expect(response.body).to have_css("link[rel='stylesheet'][href^='/assets/app']", visible: :all)
       end
     end
   end
