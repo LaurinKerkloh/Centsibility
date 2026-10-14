@@ -2,6 +2,8 @@ module Authentication
   extend ActiveSupport::Concern
 
   included do
+    # Resumed even where authentication is skipped, so the layout knows who is signed in on every page.
+    before_action :resume_session
     before_action :require_authentication
     helper_method :authenticated?
   end

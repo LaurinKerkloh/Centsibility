@@ -33,7 +33,7 @@ class Components::Layout < Components::Base
 
       body do
         header(class: "container mx-auto flex justify-end px-5 py-4") do
-          if Current.user
+          if Current.session
             button_to "Sign out", session_path, method: :delete, class: "cursor-pointer text-sm text-gray-700 underline hover:no-underline"
           end
         end
@@ -46,12 +46,17 @@ class Components::Layout < Components::Base
 
   private
 
+  FLASH_STYLES = {
+    "alert" => {role: "alert", class: "rounded-lg bg-red-50 px-3 py-2 font-medium text-red-600"},
+    "notice" => {role: "status", class: "rounded-lg bg-green-50 px-3 py-2 font-medium text-green-600"}
+  }.freeze
+
   def flash_messages
-    return unless flash[:alert] || flash[:notice]
+    messages = flash.to_hash.slice(*FLASH_STYLES.keys)
+    return if messages.empty?
 
     div(class: "container mx-auto mt-4 px-5 space-y-2") do
-      p(role: "alert", class: "rounded-lg bg-red-50 px-3 py-2 font-medium text-red-600") { flash[:alert] } if flash[:alert]
-      p(role: "status", class: "rounded-lg bg-green-50 px-3 py-2 font-medium text-green-600") { flash[:notice] } if flash[:notice]
+      messages.each { |type, message| p(**FLASH_STYLES[type]) { message } }
     end
   end
 end

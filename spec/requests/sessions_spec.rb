@@ -9,9 +9,16 @@ RSpec.describe "Sessions" do
     get new_session_path
 
     expect(response).to have_http_status(:ok)
-    expect(response.parsed_body.at_css("title").text).to eq("Sign in")
-    expect(response.parsed_body.at_css("form[action='#{session_path}'] input[name='email_address']")).to be_present
-    expect(response.parsed_body.at_css("button", text: "Sign out")).to be_nil
+    expect(response.body).to have_title("Sign in")
+    expect(response.body).to have_css("form[action='#{session_path}'] input[name='email_address']")
+    expect(response.body).to have_no_button("Sign out")
+  end
+
+  it "shows the sign-out button on public pages when signed in" do
+    sign_in_as users.user
+    get new_session_path
+
+    expect(response.body).to have_button("Sign out")
   end
 
   it "signs in and returns to the requested page", :aggregate_failures do
@@ -20,7 +27,7 @@ RSpec.describe "Sessions" do
 
     expect(response).to redirect_to(root_url)
     follow_redirect!
-    expect(response.parsed_body.at_css("form[action='#{session_path}'] button").text).to eq("Sign out")
+    expect(response.body).to have_css("form[action='#{session_path}'] button", text: "Sign out")
   end
 
   it "rejects invalid credentials with an alert", :aggregate_failures do
@@ -28,7 +35,7 @@ RSpec.describe "Sessions" do
 
     expect(response).to redirect_to(new_session_path)
     follow_redirect!
-    expect(response.parsed_body.at_css("[role='alert']").text).to include("Try another email address or password.")
+    expect(response.body).to have_css("[role='alert']", text: "Try another email address or password.")
   end
 
   it "signs out", :aggregate_failures do

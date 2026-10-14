@@ -1,6 +1,4 @@
 RSpec.describe "Authentication" do
-  include ActiveJob::TestHelper
-
   it "signs in and out", :aggregate_failures do
     visit root_path
     expect(page).to have_current_path(new_session_path)
