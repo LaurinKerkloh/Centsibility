@@ -1,3 +1,5 @@
+Capybara.enable_aria_label = true
+
 RSpec.configure do |config|
   config.include ActiveJob::TestHelper, type: :system
 

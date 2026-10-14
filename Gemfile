@@ -56,6 +56,7 @@ group :development, :test do
 
   gem "rspec-rails"
   gem "oaken"
+  gem "lookbook", "~> 2.3"
 
   gem "standard", require: false
   gem "standard-rails", require: false

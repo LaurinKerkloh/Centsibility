@@ -23,5 +23,13 @@ module Banking
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    # Lookbook is only bundled in development and test.
+    if defined?(Lookbook)
+      config.lookbook.preview_paths = [Rails.root.join("spec/components/previews")]
+      # Rails calls the layout proc with arguments, which a lambda rejects
+      config.lookbook.preview_layout = proc { Components::PreviewLayout }
+      config.lookbook.lazy_load_previews_and_pages = true
+    end
   end
 end
