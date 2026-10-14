@@ -41,3 +41,5 @@
 *.CSV
 !/test/fixtures/files/**/*.csv
 !/test/fixtures/files/**/*.CSV
+
+/.claude/worktrees/
