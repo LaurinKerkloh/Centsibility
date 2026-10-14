@@ -40,4 +40,6 @@ Personal finance app: import bank CSV exports (DKB for now), categorise transact
 - Views and components are Phlex only: pages are `Views::*` in `app/views`, components are `Components::*` in `app/components`. ERB only for mailer layouts and templates (Phlex has no plain-text counterpart for mail parts), and PWA templates.
 - Pages set their title with `page_title`; `Views::Base` wraps every page in `Components::Layout`.
 - Tailwind as plain class strings.
+- Build forms, buttons, links and alerts from `Components::Form`, `Button`, `Link` and `Alert`. Previews live in `spec/components/previews` and are served by Lookbook at `/lookbook`.
+- Colours only through the theme tokens in `app/assets/tailwind/application.css` (`bg-primary`, `text-muted`, …), never raw palette classes.
 - Seeds live in `db/seeds` (Oaken); env-specific ones go in `db/seeds/development` and `db/seeds/test`. Only the identifiers listed in `db/seeds.rb` (`Oaken.seed :accounts, ...`) are loaded, plus `setup`. Specs use the same seeds.
