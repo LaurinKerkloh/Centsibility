@@ -5,6 +5,6 @@ class Components::Link < Components::Base
   end
 
   def view_template(&)
-    a(href: @href, class: "text-primary hover:underline", **@attributes, &)
+    a(**mix({href: @href, class: "text-primary hover:underline"}, @attributes), &)
   end
 end

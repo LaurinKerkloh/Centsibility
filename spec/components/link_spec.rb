@@ -4,4 +4,10 @@ RSpec.describe Components::Link do
 
     expect(rendered).to have_css("a[href='/passwords/new'][data-turbo-frame='_top'].text-primary", text: "Forgot password?")
   end
+
+  it "adds extra classes to its own" do
+    rendered = render(described_class.new(href: "/", class: "text-sm")) { "Home" }
+
+    expect(rendered).to have_css("a.text-primary.text-sm", text: "Home")
+  end
 end

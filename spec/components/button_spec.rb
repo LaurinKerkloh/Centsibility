@@ -11,6 +11,12 @@ RSpec.describe Components::Button do
     expect(rendered).to have_css("button[type='submit'][name='commit']", text: "Save")
   end
 
+  it "adds extra classes to its own", :aggregate_failures do
+    expect(render(described_class.new(class: "w-full")) { "Save" }).to have_css("button.bg-primary.w-full")
+    expect(render(described_class.new(href: "/", class: "w-full")) { "Home" }).to have_css("a.bg-primary.w-full")
+    expect(render(described_class.new(href: "/session", method: :delete, class: "w-full")) { "Sign out" }).to have_css("button.bg-primary.w-full")
+  end
+
   it "renders the secondary and danger variants", :aggregate_failures do
     expect(render(described_class.new(variant: :secondary)) { "Cancel" }).to have_css("button.border-border", text: "Cancel")
     expect(render(described_class.new(variant: :danger)) { "Delete" }).to have_css("button.bg-danger", text: "Delete")

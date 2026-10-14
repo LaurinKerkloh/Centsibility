@@ -19,11 +19,11 @@ class Components::Button < Components::Base
 
   def view_template(&)
     if @href.nil?
-      button(type: @type, class: @classes, **@attributes, &)
+      button(**mix({type: @type, class: @classes}, @attributes), &)
     elsif @method.nil? || @method.to_s.casecmp?("get")
-      a(href: @href, class: @classes, **@attributes, &)
+      a(**mix({href: @href, class: @classes}, @attributes), &)
     else
-      button_to(@href, method: @method, class: @classes, **@attributes, &)
+      button_to(@href, **mix({method: @method, class: @classes}, @attributes), &)
     end
   end
 end

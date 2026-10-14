@@ -35,9 +35,9 @@ class Components::Field < Components::Base
 
   def input_attributes
     if errors.any?
-      {class: "#{INPUT} border-danger", aria: {invalid: true, describedby: errors_id}, **@attributes}
+      mix({class: "#{INPUT} border-danger", aria: {invalid: true, describedby: errors_id}}, @attributes)
     else
-      {class: "#{INPUT} border-border", **@attributes}
+      mix({class: "#{INPUT} border-border"}, @attributes)
     end
   end
 
