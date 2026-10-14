@@ -3,6 +3,8 @@ class Components::Layout < Components::Base
   include Phlex::Rails::Helpers::CSPMetaTag
   include Phlex::Rails::Helpers::StyleSheetLinkTag
   include Phlex::Rails::Helpers::JavaScriptImportmapTags
+  include Phlex::Rails::Helpers::ButtonTo
+  include Phlex::Rails::Helpers::Flash
 
   def initialize(title:)
     @title = title
@@ -30,8 +32,26 @@ class Components::Layout < Components::Base
       end
 
       body do
-        main(class: "container mx-auto mt-28 px-5 flex", &)
+        header(class: "container mx-auto flex justify-end px-5 py-4") do
+          if Current.user
+            button_to "Sign out", session_path, method: :delete, class: "cursor-pointer text-sm text-gray-700 underline hover:no-underline"
+          end
+        end
+
+        flash_messages
+        main(class: "container mx-auto mt-16 px-5 flex", &)
       end
+    end
+  end
+
+  private
+
+  def flash_messages
+    return unless flash[:alert] || flash[:notice]
+
+    div(class: "container mx-auto mt-4 px-5 space-y-2") do
+      p(role: "alert", class: "rounded-lg bg-red-50 px-3 py-2 font-medium text-red-600") { flash[:alert] } if flash[:alert]
+      p(role: "status", class: "rounded-lg bg-green-50 px-3 py-2 font-medium text-green-600") { flash[:notice] } if flash[:notice]
     end
   end
 end

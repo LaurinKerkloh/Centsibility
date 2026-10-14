@@ -15,3 +15,8 @@ inherit_gem:
 # defaults are loaded first as plugins. Cops the defaults mark pending stay off, like under the standardrb CLI.
 AllCops:
   NewCops: disable
+
+# System specs walk through whole user flows, which rarely fit in five lines.
+RSpec/ExampleLength:
+  Exclude:
+    - "spec/system/**/*"
