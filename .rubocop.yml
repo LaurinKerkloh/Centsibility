@@ -1,8 +1,14 @@
-# Omakase Ruby styling for Rails
-inherit_gem: { rubocop-rails-omakase: rubocop.yml }
+plugins:
+  - standard-custom
+  - standard-performance
+  - standard-rails
+  - standard-rspec
 
-# Overwrite or add rules to create your own house style
-#
-# # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`
-# Layout/SpaceInsideArrayLiteralBrackets:
-#   Enabled: false
+inherit_gem:
+  standard: config/base.yml
+
+# Mirror the standardrb CLI: pending cops stay off, and the rubocop-rspec, rubocop-rspec_rails and
+# rubocop-capybara extensions RuboCop suggests are already loaded through standard-rspec.
+AllCops:
+  NewCops: disable
+  SuggestExtensions: false
