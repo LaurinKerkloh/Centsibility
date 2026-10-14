@@ -1,8 +1,17 @@
-# Omakase Ruby styling for Rails
-inherit_gem: { rubocop-rails-omakase: rubocop.yml }
+plugins:
+  - rubocop-rspec
+  - rubocop-rspec_rails
+  - rubocop-capybara
+  - rubocop-factory_bot
+  - standard-custom
+  - standard-performance
+  - standard-rails
+  - standard-rspec
 
-# Overwrite or add rules to create your own house style
-#
-# # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`
-# Layout/SpaceInsideArrayLiteralBrackets:
-#   Enabled: false
+inherit_gem:
+  standard: config/base.yml
+
+# standard-rspec only overrides part of the rspec, rspec_rails, capybara and factory_bot configs, so their
+# defaults are loaded first as plugins. Cops the defaults mark pending stay off, like under the standardrb CLI.
+AllCops:
+  NewCops: disable

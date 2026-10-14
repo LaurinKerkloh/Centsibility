@@ -6,7 +6,9 @@ Personal finance app: import bank CSV exports (DKB for now), categorise transact
 
 - Ruby 3.4.9, Rails 8.1, SQLite
 - Hotwire (Turbo + Stimulus), importmap, Tailwind
-- Phlex for views and components, Oaken for fixtures and seeds, RSpec for tests (all being set up in #20; Minitest until then)
+- Phlex for views and components, Oaken for fixtures and seeds
+- RSpec with Capybara and Selenium (headless Chrome) for tests
+- Standard for linting, run through RuboCop
 - Solid Queue, Solid Cache, Solid Cable
 - Kamal for deployment
 
@@ -14,8 +16,8 @@ Personal finance app: import bank CSV exports (DKB for now), categorise transact
 
 - `bin/setup` – install dependencies and prepare the database
 - `bin/dev` – run the app with the Tailwind watcher
-- `bin/rails test [path:line]` – run tests (`bundle exec rspec [path:line]` after #20)
-- `bin/rubocop [-a]` – lint (and autocorrect)
+- `bundle exec rspec [path:line]` – run specs
+- `bin/rubocop [-a]` – lint with Standard (and autocorrect)
 - `bin/ci` – full local CI, steps in `config/ci.rb`
 
 ## Workflow
@@ -35,3 +37,7 @@ Personal finance app: import bank CSV exports (DKB for now), categorise transact
 ## Code conventions
 
 - Comments only for the non-obvious why, never restating the code. This includes config files.
+- Views and components are Phlex only: pages are `Views::*` in `app/views`, components are `Components::*` in `app/components`. ERB only for mailer layouts and PWA templates.
+- Pages set their title with `page_title`; `Views::Base` wraps every page in `Components::Layout`.
+- Tailwind as plain class strings.
+- Seeds live in `db/seeds` (Oaken); env-specific ones go in `db/seeds/development` and `db/seeds/test`. Only the identifiers listed in `db/seeds.rb` (`Oaken.seed :accounts, ...`) are loaded, plus `setup`. Specs use the same seeds.
