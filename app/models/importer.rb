@@ -1,26 +1,34 @@
 class Importer
-  Result = Data.define(:account, :transactions, :skipped_count, :balance)
+  Result = Data.define(:import, :account, :transactions, :skipped_count, :balance)
 
   def initialize(statement)
     @statement = statement
   end
 
-  def call(dry_run: false)
+  def call(import:)
     account = Account.find_or_initialize_by(iban: @statement.account_iban) do |account|
       account.name = account.account_type = @statement.account_type
     end
+    created_account = account.new_record?
     transactions = new_entries(account).map { build_transaction(account, it) }
-    balance = Balance.find_or_initialize_by(account:, recorded_on: @statement.balance_on)
-    balance.amount = @statement.balance
+    skipped_count = @statement.entries.size - transactions.size
+    balance = build_balance(account)
 
-    # Counterparties are listed explicitly because belongs_to autosave silently drops an invalid new one and
-    # saves the transaction without it. A dry run validates the same records, so it fails where the import would.
-    records = [account, *transactions.filter_map(&:counterparty).uniq, *transactions, balance]
-    ActiveRecord::Base.transaction do
-      records.each { dry_run ? it.validate! : it.save! }
+    if transactions.empty? && balance.nil?
+      import = nil
+    else
+      import.assign_attributes(account:, skipped_count:, created_account:)
+      # Counterparties are saved explicitly because belongs_to autosave silently drops an invalid new one
+      # and saves the transaction without it.
+      counterparties = transactions.filter_map(&:counterparty).uniq.select(&:new_record?)
+      [*counterparties, *transactions, balance].compact.each { it.import = import }
+
+      ActiveRecord::Base.transaction do
+        [account, import, *counterparties, *transactions, balance].compact.each(&:save!)
+      end
     end
 
-    Result.new(account:, transactions:, skipped_count: @statement.entries.size - transactions.size, balance:)
+    Result.new(import:, account:, transactions:, skipped_count:, balance:)
   end
 
   private
@@ -50,5 +58,11 @@ class Importer
 
     identity = Counterparty.identity(name:, iban:)
     (@counterparties ||= {})[identity] ||= Counterparty.find_or_initialize_by(identity) { it.name ||= name || identity[:iban] }
+  end
+
+  def build_balance(account)
+    return if !account.new_record? && account.balance_on(@statement.balance_on)&.amount == @statement.balance
+
+    Balance.new(account:, recorded_on: @statement.balance_on, amount: @statement.balance)
   end
 end
