@@ -5,9 +5,11 @@ module Parsers
       "Umsatztyp", "IBAN", "Betrag (€)", "Gläubiger-ID", "Mandatsreferenz", "Kundenreferenz"
     ].freeze
     HEADER_LINES = 5
-    # DKB fills the IBAN column with these when there is no real counterparty account, e.g. for its own fees
-    # and for card payments, which all run through its VISA clearing account.
-    PLACEHOLDER_IBANS = %w[0000000000 DE96120300009005290904].freeze
+    # Card payments all run through DKB's VISA clearing account, so its IBAN says nothing about the counterparty.
+    PLACEHOLDER_IBANS = %w[DE96120300009005290904].freeze
+    # For its own fees and settlements DKB puts internal account numbers (or 0000000000) in the IBAN column.
+    # They are shared by many bookings and stay available in raw_row.
+    IBAN_SHAPE = /\A[A-Z]{2}\d{2}/
     BALANCE_LABEL = /\AKontostand vom (\d{2}\.\d{2}\.\d{4}):\z/
     ROW_DATE = /\A\d{2}\.\d{2}\.\d{2}\z/
     AMOUNT = /\A-?\d{1,3}(\.\d{3})*(,\d{1,2})?\z|\A-?\d+(,\d{1,2})?\z/
@@ -79,7 +81,7 @@ module Parsers
         value_on: row_date(value_on, number),
         amount:,
         counterparty_name: amount.negative? ? payee : payer,
-        counterparty_iban: (iban unless PLACEHOLDER_IBANS.include?(iban)),
+        counterparty_iban: (iban if IBAN_SHAPE.match?(iban.to_s) && !PLACEHOLDER_IBANS.include?(iban)),
         reference:, creditor_id:, mandate_reference:, customer_reference:,
         raw_row: line
       )

@@ -52,6 +52,12 @@ RSpec.describe Parsers::Dkb do
     end
   end
 
+  it "drops internal DKB account numbers from the IBAN column" do
+    row = booked_row.sub("DE27700202700015012345", "1012345678")
+
+    expect(parse(row).entries.sole).to have_attributes(counterparty_name: "Muster Versicherung AG", counterparty_iban: nil)
+  end
+
   it "accepts other account types with the same columns" do
     expect(parse(booked_row).account_type).to eq("Tagesgeld")
   end
