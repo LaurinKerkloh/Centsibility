@@ -12,7 +12,7 @@ class Import < ApplicationRecord
   validates :filename, presence: true
   validates :skipped_count, numericality: {only_integer: true, greater_than_or_equal_to: 0}
 
-  def latest? = account.imports.order(:created_at, :id).last == self
+  def latest? = account.imports.maximum(:id) == id
 
   def revert!
     transaction do

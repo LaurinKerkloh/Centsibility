@@ -9,7 +9,7 @@ class ImportsController < ApplicationController
 
     result = Importer.new(Parsers::Dkb.parse(file.read)).call(import: Import.new(filename: file.original_filename))
     if result.import
-      redirect_to result.import, notice: "Imported #{result.transactions.size} transactions."
+      redirect_to result.import, notice: "Imported #{helpers.pluralize(result.transactions.size, "transaction")}."
     else
       redirect_to imports_path, notice: "Nothing new in #{file.original_filename}."
     end

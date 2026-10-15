@@ -35,6 +35,12 @@ RSpec.describe Import do
         expect(second).to be_latest
       end
 
+      it "goes by insertion order, not by timestamps" do
+        second.update_columns(created_at: first.created_at - 1.day)
+
+        expect(second).to be_latest
+      end
+
       it "ignores imports of other accounts" do
         expect(import(statement(entry("c", counterparty_name: "REWE"), iban: new_iban))).to be_latest
       end

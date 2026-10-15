@@ -1,7 +1,6 @@
 class Components::Table < Components::Base
   CELL = "py-2 pr-4 last:pr-0"
 
-  # headers: labels, or [label, :right] for right-aligned columns.
   def initialize(rows, headers:)
     @rows = rows
     @headers = headers
