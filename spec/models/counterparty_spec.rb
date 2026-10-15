@@ -11,6 +11,14 @@ RSpec.describe Counterparty do
     expect(described_class.new(name: "Peter Beispiel", iban: " ").iban).to be_nil
   end
 
+  it "rejects an IBAN with an invalid format" do
+    expect(described_class.new(name: "Peter Beispiel", iban: "0000000000")).not_to be_valid
+  end
+
+  it "rejects an IBAN with a wrong checksum" do
+    expect(described_class.new(name: "Peter Beispiel", iban: "DE78120300002345678901")).not_to be_valid
+  end
+
   it "requires a unique IBAN" do
     counterparty = described_class.new(name: "Other name", iban: counterparties.employer.iban)
 

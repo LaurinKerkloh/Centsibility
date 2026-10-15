@@ -1,5 +1,5 @@
 class Counterparty < ApplicationRecord
-  include NormalizesIban
+  include HasIban
 
   has_many :transactions, dependent: :restrict_with_error
 
