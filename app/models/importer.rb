@@ -20,7 +20,7 @@ class Importer
       import.assign_attributes(account:, skipped_count:, created_account:)
       # Counterparties are saved explicitly because belongs_to autosave silently drops an invalid new one
       # and saves the transaction without it.
-      counterparties = transactions.filter_map(&:counterparty).uniq.select(&:new_record?)
+      counterparties = @counterparties.to_h.values.select(&:new_record?)
       [*counterparties, *transactions, balance].compact.each { it.import = import }
 
       ActiveRecord::Base.transaction do
