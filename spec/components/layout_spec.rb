@@ -20,6 +20,13 @@ RSpec.describe Components::Layout do
     expect(rendered).to have_css("header form[action='/session'] button.border-border", text: "Sign out")
   end
 
+  it "links to the imports in the header only when signed in", :aggregate_failures do
+    signed_in = Current.set(session: users.user.sessions.create!) { render(described_class.new(title: "Home")) }
+
+    expect(signed_in).to have_css("header nav a[href='/imports']", text: "Imports")
+    expect(render(described_class.new(title: "Sign in"))).to have_no_link("Imports")
+  end
+
   it "renders notice and alert flashes as success and error alerts", :aggregate_failures do
     rendered = render(described_class.new(title: "Home"), flash: {notice: "Saved", alert: "Failed"})
 
