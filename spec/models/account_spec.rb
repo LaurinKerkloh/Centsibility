@@ -47,6 +47,24 @@ RSpec.describe Account do
     expect { account.save(validate: false) }.to raise_error(ActiveRecord::RecordNotUnique)
   end
 
+  describe "#balance_on" do
+    let(:girokonto) { accounts.girokonto }
+
+    it "returns the balance of that date" do
+      expect(girokonto.balance_on(balances.girokonto_current.recorded_on)).to eq(balances.girokonto_current)
+    end
+
+    it "returns the balance created last when there are several" do
+      newer = girokonto.balances.create!(recorded_on: balances.girokonto_current.recorded_on, amount: "10")
+
+      expect(girokonto.balance_on(newer.recorded_on)).to eq(newer)
+    end
+
+    it "returns nil without a balance on that date" do
+      expect(girokonto.balance_on(Date.new(2026, 1, 1))).to be_nil
+    end
+  end
+
   it "cannot be deleted while it has transactions" do
     accounts.girokonto.balances.destroy_all
 

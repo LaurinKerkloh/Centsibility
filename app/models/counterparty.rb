@@ -1,6 +1,8 @@
 class Counterparty < ApplicationRecord
   include HasIban
 
+  belongs_to :import, optional: true
+
   has_many :transactions, dependent: :restrict_with_error
 
   validates :name, presence: true

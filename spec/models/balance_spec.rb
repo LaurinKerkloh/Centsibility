@@ -13,15 +13,9 @@ RSpec.describe Balance do
     end
   end
 
-  it "allows one balance per account and date" do
+  it "allows several balances per account and date" do
     balance.recorded_on = balances.girokonto_current.recorded_on
 
-    expect(balance).not_to be_valid
-  end
-
-  it "enforces one balance per account and date in the database" do
-    balance.recorded_on = balances.girokonto_current.recorded_on
-
-    expect { balance.save(validate: false) }.to raise_error(ActiveRecord::RecordNotUnique)
+    expect(balance.save).to be(true)
   end
 end
