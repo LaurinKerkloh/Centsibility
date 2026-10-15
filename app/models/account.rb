@@ -4,7 +4,7 @@ class Account < ApplicationRecord
   has_many :transactions, dependent: :restrict_with_error
   has_many :balances, dependent: :restrict_with_error
 
-  normalizes :iban, with: ->(iban) { iban.delete(" ").upcase }
+  include NormalizesIban
 
   validates :name, presence: true
   validates :iban, presence: true, uniqueness: true

@@ -3,6 +3,14 @@ RSpec.describe Counterparty do
     expect(described_class.new(name: "")).not_to be_valid
   end
 
+  it "normalises the IBAN" do
+    expect(described_class.new(name: "Peter Beispiel", iban: "de79 1203 0000 2345 6789 01").iban).to eq("DE79120300002345678901")
+  end
+
+  it "stores a blank IBAN as nil" do
+    expect(described_class.new(name: "Peter Beispiel", iban: " ").iban).to be_nil
+  end
+
   it "requires a unique IBAN" do
     counterparty = described_class.new(name: "Other name", iban: counterparties.employer.iban)
 

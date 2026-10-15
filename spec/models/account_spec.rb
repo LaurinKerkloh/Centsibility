@@ -18,7 +18,7 @@ RSpec.describe Account do
   end
 
   it "normalises the IBAN" do
-    account.iban = "de18 1203 0000 1234 5678 91"
+    account.iban = "de18 1203 0000\t1234 5678 91"
 
     expect(account.iban).to eq("DE18120300001234567891")
   end

@@ -1,4 +1,6 @@
 class Counterparty < ApplicationRecord
+  include NormalizesIban
+
   has_many :transactions, dependent: :restrict_with_error
 
   validates :name, presence: true
