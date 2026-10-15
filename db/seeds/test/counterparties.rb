@@ -1,5 +1,0 @@
-counterparties.create :employer, name: "Beispiel Software GmbH", iban: "DE31100700000004455667"
-counterparties.create :savings, name: "Erika Mustermann und Max Mustermann", iban: "DE18120300001234567891"
-counterparties.create :insurance, name: "Muster Versicherung AG", iban: "DE27700202700015012345"
-counterparties.create :rewe, name: "REWE"
-counterparties.create :dkb, name: "DKB AG"

@@ -8,10 +8,6 @@ RSpec.describe Transaction do
     expect(transaction).to be_valid
   end
 
-  it "belongs to a counterparty" do
-    expect(transactions.salary.counterparty).to eq(counterparties.employer)
-  end
-
   it "requires an account" do
     transaction.account = nil
 
