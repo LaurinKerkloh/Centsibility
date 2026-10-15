@@ -8,7 +8,13 @@ RSpec.describe "Imports" do
     post imports_path, params: {import: {file: Rack::Test::UploadedFile.new(file.path, "text/csv", original_filename: filename)}}
   end
 
-  def import_sample = Importer.new(Parsers::Dkb.parse(sample.read)).call(import: Import.new(filename: "girokonto.csv")).import
+  def import_sample(replacements = {}, filename: "girokonto.csv")
+    content = replacements.reduce(sample.read) { |content, (from, to)| content.sub(from, to) }
+    Importer.new(Parsers::Dkb.parse(content)).call(import: Import.new(filename:)).import
+  end
+
+  # A later export of the seeded account with a new balance, so it is recorded as an import.
+  def import_later = import_sample({"1.616,35" => "1.700,00"}, filename: "later.csv")
 
   it "redirects to the login page when signed out" do
     delete session_path
@@ -18,20 +24,28 @@ RSpec.describe "Imports" do
   end
 
   describe "GET /imports" do
-    it "shows the upload form and the history, newest first", :aggregate_failures do
-      older = import_sample
-      newer = Importer.new(Parsers::Dkb.parse(sample.read.sub("DE45120300001234567890", "DE08500105170007654321")))
-        .call(import: Import.new(filename: "tagesgeld.csv")).import
-      newer.update_columns(created_at: older.created_at + 1.day)
-
+    it "shows the upload form", :aggregate_failures do
       get imports_path
 
       expect(response.body).to have_title("Imports")
       expect(response.body).to have_css("form[action='/imports'][enctype='multipart/form-data'] input[type='file'][name='import[file]'][accept='.csv,text/csv']")
-      expect(response.body).to have_css("tbody tr", count: 2)
-      expect(response.body).to have_css("tbody tr:first-child a[href='/imports/#{newer.id}']", text: "tagesgeld.csv")
-      expect(response.body).to have_css("tbody tr:last-child", text: /girokonto\.csv.*Girokonto.*#{older.transactions.count}.*5/)
-      expect(response.body).to have_css("tbody tr:last-child", text: older.created_at.strftime("%d.%m.%Y"))
+    end
+
+    context "with imports" do
+      let!(:older) { import_sample }
+      let!(:newer) { import_later.tap { it.update_columns(created_at: older.created_at + 1.day) } }
+
+      before { get imports_path }
+
+      it "lists them newest first, linking to each", :aggregate_failures do
+        expect(response.body).to have_css("tbody tr", count: 2)
+        expect(response.body).to have_css("tbody tr:first-child a[href='/imports/#{newer.id}']", text: "later.csv")
+      end
+
+      it "shows date, file, account, new and skipped counts" do
+        expect(response.body).to have_css("tbody tr:last-child",
+          exact_text: /#{older.created_at.strftime("%d.%m.%Y")}\s*girokonto\.csv\s*Girokonto\s*#{older.transactions.count}\s*5/)
+      end
     end
 
     it "says when nothing was imported yet" do
@@ -79,10 +93,7 @@ RSpec.describe "Imports" do
     end
 
     it "shows the error when a record can't be saved", :aggregate_failures do
-      invalid = Transaction.new.tap(&:validate)
-      allow(Importer).to receive(:new).and_wrap_original do |original, statement|
-        original.call(statement).tap { allow(it).to receive(:call).and_raise(ActiveRecord::RecordInvalid, invalid) }
-      end
+      allow(Transaction).to receive(:new).and_wrap_original { |original, **attributes| original.call(**attributes, booked_on: nil) }
 
       expect { upload }.not_to change(Import, :count)
       expect(response).to have_http_status(:unprocessable_content)
@@ -91,26 +102,31 @@ RSpec.describe "Imports" do
   end
 
   describe "GET /imports/:id" do
-    it "shows the summary and the added transactions", :aggregate_failures do
-      import = import_sample
+    context "with the latest import of an existing account" do
+      let!(:import) { import_sample }
 
-      get import_path(import)
+      before { get import_path(import) }
 
-      first = import.transactions.order(:booked_on, :id).first
-      expect(response.body).to have_title("girokonto.csv")
-      expect(response.body).to have_css("dd", exact_text: "Girokonto")
-      expect(response.body).to have_css("dd", exact_text: "None")
-      expect(response.body).to have_css("tbody tr", count: import.transactions.count)
-      expect(response.body).to have_css("tbody tr:first-child",
-        text: /#{first.booked_on.strftime("%d.%m.%Y")}.*#{first.counterparty.name}.*#{Regexp.escape(first.reference)}/)
-      expect(response.body).to have_button("Delete import")
+      it "shows the summary", :aggregate_failures do
+        expect(response.body).to have_title("girokonto.csv")
+        expect(response.body).to have_css("dd", exact_text: "Girokonto")
+        expect(response.body).to have_css("dd", exact_text: "None")
+      end
+
+      it "lists the added transactions", :aggregate_failures do
+        first = import.transactions.order(:booked_on, :id).first
+        expect(response.body).to have_css("tbody tr", count: import.transactions.count)
+        expect(response.body).to have_css("tbody tr:first-child",
+          text: /#{first.booked_on.strftime("%d.%m.%Y")}.*#{first.counterparty.name}.*#{Regexp.escape(first.reference)}/)
+      end
+
+      it "offers to delete it" do
+        expect(response.body).to have_css("form[data-turbo-confirm] button", text: "Delete import")
+      end
     end
 
     it "marks an account the import created and shows the balance it added", :aggregate_failures do
-      content = sample.read.sub("DE45120300001234567890", "DE08500105170007654321")
-      import = Importer.new(Parsers::Dkb.parse(content)).call(import: Import.new(filename: "neu.csv")).import
-
-      get import_path(import)
+      get import_path(import_sample({"DE45120300001234567890" => "DE08500105170007654321"}))
 
       expect(response.body).to have_css("dd", exact_text: "Girokonto new")
       expect(response.body).to have_css("dd", exact_text: "1.616,35 € on 14.10.2026")
@@ -118,7 +134,7 @@ RSpec.describe "Imports" do
 
     it "offers no delete button for an older import" do
       older = import_sample
-      Importer.new(Parsers::Dkb.parse(sample.read.sub("1.616,35", "1.700,00"))).call(import: Import.new(filename: "later.csv"))
+      import_later
 
       get import_path(older)
 
@@ -130,14 +146,14 @@ RSpec.describe "Imports" do
     it "reverts the latest import", :aggregate_failures do
       import = import_sample
 
-      expect { delete import_path(import) }.to change(Import, :count).by(-1).and change(Transaction, :count).by(-import.transactions.count)
+      expect { delete import_path(import) }.to change(Transaction, :count).by(-import.transactions.count)
       expect(response).to redirect_to(imports_path)
       expect(flash[:notice]).to eq("Deleted the import of girokonto.csv.")
     end
 
     it "refuses to delete an older import", :aggregate_failures do
       older = import_sample
-      Importer.new(Parsers::Dkb.parse(sample.read.sub("1.616,35", "1.700,00"))).call(import: Import.new(filename: "later.csv"))
+      import_later
 
       expect { delete import_path(older) }.not_to change(Import, :count)
       expect(response).to redirect_to(import_path(older))
