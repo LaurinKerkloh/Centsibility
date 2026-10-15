@@ -94,6 +94,12 @@ RSpec.describe Importer do
       expect { described_class.new(statement(*entries)).call }.to change(Counterparty, :count).by(2)
     end
 
+    it "names a new counterparty without name after its normalised IBAN" do
+      result = described_class.new(statement(entry("a", counterparty_name: nil, counterparty_iban: "de79 1203 0000 2345 6789 01"))).call
+
+      expect(result.transactions.sole.counterparty.name).to eq("DE79120300002345678901")
+    end
+
     it "leaves rows without counterparty name and IBAN without counterparty" do
       result = described_class.new(statement(entry("a", counterparty_name: nil))).call
 
@@ -143,6 +149,12 @@ RSpec.describe Importer do
     it "does not create the account" do
       expect { described_class.new(statement(entry("a"), iban: "DE08500105170007654321")).call(dry_run: true) }
         .not_to change(Account, :count)
+    end
+
+    it "fails like a real import on an invalid record" do
+      importer = described_class.new(statement(entry("a", counterparty_iban: "DE00123")))
+
+      expect { importer.call(dry_run: true) }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
     it "returns the same result as a real import", :aggregate_failures do

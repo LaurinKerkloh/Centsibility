@@ -53,7 +53,7 @@ module Parsers
       label, amount = fields(line, 3)
       raise InvalidFile, "Line 3: expected \"Kontostand vom DD.MM.YYYY:\"." unless (match = BALANCE_LABEL.match(label))
 
-      [date(match[1], "%d.%m.%Y", 3), amount(amount.to_s.delete_suffix(" €"), 3)]
+      [date(match[1], "%d.%m.%Y", 3), amount(amount.to_s.sub(/[[:space:]]*€\z/, ""), 3)]
     end
 
     def column_line(line)

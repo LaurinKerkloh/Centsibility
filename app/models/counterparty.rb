@@ -7,7 +7,7 @@ class Counterparty < ApplicationRecord
   validates :name, uniqueness: {conditions: -> { where(iban: nil) }}, if: -> { iban.nil? }
   validates :iban, uniqueness: true, allow_nil: true
 
-  # The attributes that identify a counterparty, matching the uniqueness rules above.
+  # Mirrors the uniqueness rules above, so lookups never pick a record the validations would treat as different.
   def self.identity(name:, iban:)
     iban = normalize_value_for(:iban, iban)
     iban ? {iban:} : {iban: nil, name:}

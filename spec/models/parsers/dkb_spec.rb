@@ -79,6 +79,12 @@ RSpec.describe Parsers::Dkb do
     expect(parse(booked_row, booked_row).entries.size).to eq(2)
   end
 
+  ["1.616,35€", "1.616,35 €"].each do |balance|
+    it "reads the balance #{balance.inspect}" do
+      expect(parse(head: header.sub("1.616,35 €", balance)).balance).to eq(BigDecimal("1616.35"))
+    end
+  end
+
   it "accepts a file without BOM" do
     expect(parse(booked_row, head: header.delete_prefix("\uFEFF")).account_iban).to eq("DE45120300001234567890")
   end
