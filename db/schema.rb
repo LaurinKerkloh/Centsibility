@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_15_102937) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_15_113959) do
   create_table "accounts", force: :cascade do |t|
     t.string "name", null: false
     t.string "iban", null: false
@@ -61,6 +61,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_15_102937) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["account_id", "booked_on"], name: "index_transactions_on_account_id_and_booked_on"
+    t.index ["account_id", "raw_row"], name: "index_transactions_on_account_id_and_raw_row"
     t.index ["counterparty_id"], name: "index_transactions_on_counterparty_id"
   end
 
