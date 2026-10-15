@@ -26,8 +26,8 @@ module Parsers
       balance_on, balance = balance_line(lines[2])
       column_line(lines[4])
 
-      entries = lines.drop(HEADER_LINES).each_with_index.filter_map do |line, index|
-        entry(line, index + HEADER_LINES + 1) unless line.empty?
+      entries = lines.drop(HEADER_LINES).each.with_index(HEADER_LINES + 1).filter_map do |line, number|
+        entry(line, number) unless line.empty?
       end
 
       Statement.new(account_iban:, account_type:, balance:, balance_on:, entries:)
@@ -39,7 +39,7 @@ module Parsers
       content = @content.dup.force_encoding(Encoding::UTF_8)
       raise InvalidFile, "The file is not valid UTF-8 text. Upload the CSV export unchanged." unless content.valid_encoding?
 
-      content.delete_prefix("﻿").each_line(chomp: true).to_a
+      content.delete_prefix("\uFEFF").each_line(chomp: true).to_a
     end
 
     def account_line(line)
@@ -69,11 +69,8 @@ module Parsers
       booked_on, value_on, status, payer, payee, reference, _type, iban, amount, creditor_id, mandate_reference,
         customer_reference = fields.map(&:presence)
 
-      case status
-      when "Vorgemerkt" then return
-      when "Gebucht" then nil
-      else raise InvalidFile, "Line #{number}: unknown status #{status.inspect}."
-      end
+      return if status == "Vorgemerkt"
+      raise InvalidFile, "Line #{number}: unknown status #{status.inspect}." unless status == "Gebucht"
 
       amount = amount(amount, number)
 

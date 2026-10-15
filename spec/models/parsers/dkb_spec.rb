@@ -1,7 +1,7 @@
 RSpec.describe Parsers::Dkb do
   let(:header) do
     <<~CSV
-      ﻿"Tagesgeld";"DE45120300001234567890"
+      \uFEFF"Tagesgeld";"DE45120300001234567890"
 
       "Kontostand vom 14.10.2026:";"1.616,35 €"
       ""
@@ -80,7 +80,7 @@ RSpec.describe Parsers::Dkb do
   end
 
   it "accepts a file without BOM" do
-    expect(parse(booked_row, head: header.delete_prefix("﻿")).account_iban).to eq("DE45120300001234567890")
+    expect(parse(booked_row, head: header.delete_prefix("\uFEFF")).account_iban).to eq("DE45120300001234567890")
   end
 
   it "accepts content read as binary" do

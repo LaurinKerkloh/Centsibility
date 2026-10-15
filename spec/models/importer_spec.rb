@@ -49,10 +49,10 @@ RSpec.describe Importer do
   end
 
   it "creates the account from the statement when its IBAN is unknown", :aggregate_failures do
-    result = described_class.new(statement(entry("a"), iban: "DE18120300001234567891")).call
+    result = described_class.new(statement(entry("a"), iban: "DE08500105170007654321")).call
 
     expect(result.account).to have_attributes(persisted?: true, name: "Tagesgeld", account_type: "Tagesgeld",
-      iban: "DE18120300001234567891")
+      iban: "DE08500105170007654321")
     expect(result.transactions.sole.account).to eq(result.account)
   end
 
@@ -102,7 +102,7 @@ RSpec.describe Importer do
   end
 
   describe "duplicates" do
-    let(:seeded_row) { accounts.girokonto.transactions.first.raw_row }
+    let(:seeded_row) { transactions.direct_debit.raw_row }
 
     it "saves identical lines of a fresh file", :aggregate_failures do
       result = described_class.new(statement(entry("a"), entry("a"))).call
@@ -119,14 +119,14 @@ RSpec.describe Importer do
     end
 
     it "only compares against the same account" do
-      result = described_class.new(statement(entry(seeded_row), iban: "DE18120300001234567891")).call
+      result = described_class.new(statement(entry(seeded_row), iban: "DE08500105170007654321")).call
 
       expect(result.skipped_count).to eq(0)
     end
   end
 
   it "saves nothing when a record is invalid" do
-    importer = described_class.new(statement(entry("a"), entry("b", counterparty_iban: "DE00123"), iban: "DE18120300001234567891"))
+    importer = described_class.new(statement(entry("a"), entry("b", counterparty_iban: "DE00123"), iban: "DE08500105170007654321"))
 
     expect { importer.call }.to raise_error(ActiveRecord::RecordInvalid)
       .and not_change { [Account.count, Transaction.count, Counterparty.count, Balance.count] }
@@ -141,7 +141,7 @@ RSpec.describe Importer do
     end
 
     it "does not create the account" do
-      expect { described_class.new(statement(entry("a"), iban: "DE18120300001234567891")).call(dry_run: true) }
+      expect { described_class.new(statement(entry("a"), iban: "DE08500105170007654321")).call(dry_run: true) }
         .not_to change(Account, :count)
     end
 

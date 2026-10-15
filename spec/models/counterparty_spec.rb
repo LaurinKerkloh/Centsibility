@@ -49,6 +49,14 @@ RSpec.describe Counterparty do
     expect { counterparty.save(validate: false) }.to raise_error(ActiveRecord::RecordNotUnique)
   end
 
+  it "is identified by its normalised IBAN when it has one" do
+    expect(described_class.identity(name: "Peter", iban: "de79 1203 0000 2345 6789 01")).to eq(iban: "DE79120300002345678901")
+  end
+
+  it "is identified by its name when it has no IBAN" do
+    expect(described_class.identity(name: "Peter", iban: nil)).to eq(iban: nil, name: "Peter")
+  end
+
   it "cannot be deleted while it has transactions" do
     expect(counterparties.rewe.destroy).to be(false)
   end
