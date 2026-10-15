@@ -26,7 +26,7 @@ class Views::Imports::Show < Views::Base
 
   def summary
     dl(class: "grid grid-cols-[auto_1fr] gap-x-6 gap-y-2 text-sm") do
-      item("Imported") { @import.created_at.strftime("%d.%m.%Y %H:%M") }
+      item("Imported") { @import.created_at.to_fs(:de) }
       item("Account") do
         plain @import.account.name
         if @import.created_account?
@@ -39,7 +39,7 @@ class Views::Imports::Show < Views::Base
       item("Balance") do
         if (balance = @import.balances.first)
           render Components::Amount.new(balance.amount)
-          plain " on #{balance.recorded_on.strftime("%d.%m.%Y")}"
+          plain " on #{balance.recorded_on.to_fs(:de)}"
         else
           span(class: "text-muted") { "None" }
         end
@@ -55,26 +55,12 @@ class Views::Imports::Show < Views::Base
   def transaction_table
     return p(class: "text-muted") { "No new transactions." } if @transactions.empty?
 
-    table(class: "w-full text-left text-sm") do
-      thead(class: "border-b border-border text-muted") do
-        tr do
-          th(class: "py-2 pr-4 font-medium") { "Booked on" }
-          th(class: "py-2 pr-4 font-medium") { "Counterparty" }
-          th(class: "py-2 pr-4 font-medium") { "Reference" }
-          th(class: "py-2 text-right font-medium") { "Amount" }
-        end
-      end
-
-      tbody(class: "divide-y divide-border") do
-        @transactions.each do |transaction|
-          tr do
-            td(class: "py-2 pr-4 whitespace-nowrap") { transaction.booked_on.strftime("%d.%m.%Y") }
-            td(class: "py-2 pr-4") { transaction.counterparty&.name }
-            td(class: "py-2 pr-4 text-muted") { transaction.reference }
-            td(class: "py-2 text-right") { render Components::Amount.new(transaction.amount) }
-          end
-        end
-      end
+    headers = ["Booked on", "Counterparty", "Reference", ["Amount", :right]]
+    render Components::Table.new(@transactions, headers:) do |table, transaction|
+      table.cell(class: "whitespace-nowrap") { transaction.booked_on.to_fs(:de) }
+      table.cell { transaction.counterparty&.name }
+      table.cell(class: "text-muted") { transaction.reference }
+      table.cell(align: :right) { render Components::Amount.new(transaction.amount) }
     end
   end
 end

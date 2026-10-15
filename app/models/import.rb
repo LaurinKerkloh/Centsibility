@@ -7,6 +7,8 @@ class Import < ApplicationRecord
 
   attribute :file
 
+  scope :with_new_count, -> { left_joins(:transactions).group(:id).select("imports.*, COUNT(transactions.id) AS new_count") }
+
   validates :filename, presence: true
   validates :skipped_count, numericality: {only_integer: true, greater_than_or_equal_to: 0}
 

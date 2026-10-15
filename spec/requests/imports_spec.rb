@@ -4,12 +4,12 @@ RSpec.describe "Imports" do
   before { sign_in_as users.user }
 
   def upload(content = sample.read, filename: "girokonto.csv")
-    file = Tempfile.new(["upload", ".csv"]).tap { it.binmode.write(content) && it.rewind }
-    post imports_path, params: {import: {file: Rack::Test::UploadedFile.new(file.path, "text/csv", original_filename: filename)}}
+    file = Rack::Test::UploadedFile.new(StringIO.new(content), "text/csv", original_filename: filename)
+    post imports_path, params: {import: {file:}}
   end
 
   def import_sample(replacements = {}, filename: "girokonto.csv")
-    content = replacements.reduce(sample.read) { |content, (from, to)| content.sub(from, to) }
+    content = replacements.reduce(sample.read) { |csv, (from, to)| csv.sub(from, to) }
     Importer.new(Parsers::Dkb.parse(content)).call(import: Import.new(filename:)).import
   end
 
@@ -44,7 +44,7 @@ RSpec.describe "Imports" do
 
       it "shows date, file, account, new and skipped counts" do
         expect(response.body).to have_css("tbody tr:last-child",
-          exact_text: /#{older.created_at.strftime("%d.%m.%Y")}\s*girokonto\.csv\s*Girokonto\s*#{older.transactions.count}\s*5/)
+          exact_text: /#{older.created_at.to_fs(:de)}\s*girokonto\.csv\s*Girokonto\s*#{older.transactions.count}\s*5/)
       end
     end
 
@@ -117,7 +117,7 @@ RSpec.describe "Imports" do
         first = import.transactions.order(:booked_on, :id).first
         expect(response.body).to have_css("tbody tr", count: import.transactions.count)
         expect(response.body).to have_css("tbody tr:first-child",
-          text: /#{first.booked_on.strftime("%d.%m.%Y")}.*#{first.counterparty.name}.*#{Regexp.escape(first.reference)}/)
+          text: /#{first.booked_on.to_fs(:de)}.*#{first.counterparty.name}.*#{Regexp.escape(first.reference)}/)
       end
 
       it "offers to delete it" do

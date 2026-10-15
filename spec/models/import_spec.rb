@@ -22,18 +22,7 @@ RSpec.describe Import do
   end
 
   context "with imported statements" do
-    let(:other_iban) { "DE08500105170007654321" }
-
-    def entry(raw_row, counterparty_name:)
-      Parsers::Entry.new(booked_on: Date.new(2026, 10, 14), value_on: Date.new(2026, 10, 14), amount: BigDecimal("-3.5"),
-        counterparty_name:, counterparty_iban: nil, reference: "Brötchen", creditor_id: nil, mandate_reference: nil,
-        customer_reference: nil, raw_row:)
-    end
-
-    def statement(*entries, iban: accounts.girokonto.iban, balance: "100")
-      Parsers::Statement.new(account_iban: iban, account_type: "Tagesgeld", balance: BigDecimal(balance),
-        balance_on: Date.new(2026, 10, 14), entries:)
-    end
+    let(:new_iban) { "DE08500105170007654321" }
 
     def import(statement) = Importer.new(statement).call(import: described_class.new(filename: "export.csv")).import
 
@@ -47,7 +36,7 @@ RSpec.describe Import do
       end
 
       it "ignores imports of other accounts" do
-        expect(import(statement(entry("c", counterparty_name: "REWE"), iban: other_iban))).to be_latest
+        expect(import(statement(entry("c", counterparty_name: "REWE"), iban: new_iban))).to be_latest
       end
     end
 
@@ -62,7 +51,7 @@ RSpec.describe Import do
       end
 
       it "makes the previous balance of that day current again" do
-        import(statement(balance: "50")).revert!
+        import(statement(balance: "50", balance_on: Date.new(2026, 10, 14))).revert!
 
         expect(accounts.girokonto.balance_on(Date.new(2026, 10, 14))).to eq(balances.girokonto_current)
       end
@@ -83,7 +72,7 @@ RSpec.describe Import do
       end
 
       it "deletes the account it created" do
-        reverted = import(statement(entry("a", counterparty_name: "REWE"), iban: other_iban))
+        reverted = import(statement(entry("a", counterparty_name: "REWE"), iban: new_iban))
 
         expect { reverted.revert! }.to change(Account, :count).by(-1)
       end

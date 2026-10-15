@@ -24,28 +24,13 @@ class Views::Imports::Index < Views::Base
   def history
     return p(class: "text-muted") { "No imports yet." } if @imports.empty?
 
-    table(class: "w-full text-left text-sm") do
-      thead(class: "border-b border-border text-muted") do
-        tr do
-          th(class: "py-2 pr-4 font-medium") { "Date" }
-          th(class: "py-2 pr-4 font-medium") { "File" }
-          th(class: "py-2 pr-4 font-medium") { "Account" }
-          th(class: "py-2 pr-4 text-right font-medium") { "New" }
-          th(class: "py-2 text-right font-medium") { "Skipped" }
-        end
-      end
-
-      tbody(class: "divide-y divide-border") do
-        @imports.each do |import|
-          tr do
-            td(class: "py-2 pr-4") { import.created_at.strftime("%d.%m.%Y") }
-            td(class: "py-2 pr-4") { render Components::Link.new(href: import_path(import)) { import.filename } }
-            td(class: "py-2 pr-4") { import.account.name }
-            td(class: "py-2 pr-4 text-right tabular-nums") { import.new_count.to_s }
-            td(class: "py-2 text-right tabular-nums") { import.skipped_count.to_s }
-          end
-        end
-      end
+    headers = ["Date", "File", "Account", ["New", :right], ["Skipped", :right]]
+    render Components::Table.new(@imports, headers:) do |table, import|
+      table.cell { import.created_at.to_fs(:de) }
+      table.cell { render Components::Link.new(href: import_path(import)) { import.filename } }
+      table.cell { import.account.name }
+      table.cell(align: :right, class: "tabular-nums") { import.new_count.to_s }
+      table.cell(align: :right, class: "tabular-nums") { import.skipped_count.to_s }
     end
   end
 end
