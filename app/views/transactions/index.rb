@@ -4,15 +4,17 @@ class Views::Transactions::Index < Views::Base
 
   DIRECTIONS = [["All", ""], *Transaction::Filter::DIRECTIONS.map { [it.humanize, it] }].freeze
 
-  def initialize(filter:)
+  def initialize(account:, filter:, transactions_page:)
+    @account = account
     @filter = filter
+    @transactions_page = transactions_page
   end
 
-  def page_title = account.name
+  def page_title = @account.name
 
   def view_template
     div(class: "w-full space-y-10") do
-      h1(class: "text-2xl font-bold") { account.name }
+      h1(class: "text-2xl font-bold") { @account.name }
 
       filters
       turbo_frame_tag("transactions_list", class: "block space-y-4") { list }
@@ -21,10 +23,8 @@ class Views::Transactions::Index < Views::Base
 
   private
 
-  def account = @filter.account
-
   def filters
-    render Components::Form.new(model: @filter, scope: "", url: account_transactions_path(account), method: :get,
+    render Components::Form.new(model: @filter, scope: "", url: account_transactions_path(@account), method: :get,
       class!: "flex flex-wrap items-end gap-4",
       data: {controller: "auto-submit date-range", turbo_frame: "transactions_list", turbo_action: "advance",
              action: "change->auto-submit#submit formdata->auto-submit#dropBlank"}) do |form|
@@ -42,17 +42,16 @@ class Views::Transactions::Index < Views::Base
   def clear_filters
     return unless @filter.any?
 
-    render Components::Link.new(href: account_transactions_path(account), class: "text-sm",
+    render Components::Link.new(href: account_transactions_path(@account), class: "text-sm",
       data: {turbo_frame: "_top"}) { "Clear filters" }
   end
 
   def list
     clear_filters
-    transactions = @filter.transactions
-    return p(class: "text-muted") { empty_message } if transactions.empty?
+    return p(class: "text-muted") { empty_message } if @transactions_page.records.empty?
 
-    render Components::Table.new(transactions, headers: HEADERS, body: {id: "transactions"}), &method(:cells)
-    render Views::Transactions::More.new(@filter)
+    render Components::Table.new(@transactions_page.records, headers: HEADERS, body: {id: "transactions"}), &method(:cells)
+    render Views::Transactions::More.new(account: @account, filter: @filter, transactions_page: @transactions_page)
   end
 
   def empty_message = @filter.any? ? "No transactions match these filters." : "No transactions yet."

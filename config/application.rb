@@ -27,9 +27,6 @@ module Banking
     # Lets the import file field show the parser's full-sentence errors without the attribute name in front.
     config.active_model.i18n_customize_full_message = true
 
-    # The format comes from the URL (e.g. .turbo_stream) and is no attribute of what the params are permitted for.
-    config.action_controller.always_permitted_parameters = %w[controller action format]
-
     # Lookbook is only bundled in development and test.
     if defined?(Lookbook)
       config.lookbook.preview_paths = [Rails.root.join("spec/components/previews")]

@@ -1,4 +1,6 @@
 class Transaction < ApplicationRecord
+  include Paginatable
+
   belongs_to :account
   belongs_to :counterparty, optional: true
   belongs_to :import, optional: true
@@ -8,4 +10,9 @@ class Transaction < ApplicationRecord
 
   scope :income, -> { where.not(amount: ..0) }
   scope :spending, -> { where(amount: ...0) }
+
+  # Called on a relation, all is that relation, e.g. an account's transactions.
+  def self.filtered(filter)
+    filter.apply(all)
+  end
 end

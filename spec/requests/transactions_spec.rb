@@ -85,7 +85,7 @@ RSpec.describe "Transactions" do
     end
 
     context "with more than one page" do
-      before { stub_const("Transaction::Filter::PER_PAGE", 2) }
+      before { stub_const("TransactionsController::PER_PAGE", 2) }
 
       it "renders the first page and a sentinel loading the next one with the filters", :aggregate_failures do
         get account_transactions_path(girokonto, direction: "spending")

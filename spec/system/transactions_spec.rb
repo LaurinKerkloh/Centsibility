@@ -2,7 +2,7 @@ RSpec.describe "Transactions" do
   before { sign_in_as users.user }
 
   it "loads further pages while scrolling until the end of the list", :aggregate_failures do
-    stub_const("Transaction::Filter::PER_PAGE", 2)
+    stub_const("TransactionsController::PER_PAGE", 2)
     click_link "Accounts"
     click_link "Girokonto"
 
