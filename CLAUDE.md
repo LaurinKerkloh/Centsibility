@@ -37,6 +37,8 @@ Personal finance app: import bank CSV exports (DKB for now), categorise transact
 ## Code conventions
 
 - Comments only for the non-obvious why, never restating the code. This includes config files.
+- Controllers stay minimal: read params, call one model method, then render or redirect on its result (e.g. `persisted?`). Parsing, rescuing domain errors and turning them into `errors`, and multi-step logic belong in the model (see `Import.from_file`).
+- Errors are added and raised as i18n keys (`errors.add(:file, :nothing_new, filename:)`, `raise InvalidFile.new(:unknown_status, ...)`), with the English text in `config/locales/en.yml`, so model code doesn't carry full sentences. Notices and other UI text can stay plain strings for now.
 - Views and components are Phlex only: pages are `Views::*` in `app/views`, components are `Components::*` in `app/components`. ERB only for mailer layouts and templates (Phlex has no plain-text counterpart for mail parts), and PWA templates.
 - Pages set their title with `page_title`; `Views::Base` wraps every page in `Components::Layout`.
 - Tailwind as plain class strings.

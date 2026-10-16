@@ -31,9 +31,12 @@ class Components::Layout < Components::Base
       end
 
       body do
-        header(class: "container mx-auto flex justify-end px-5 py-4") do
+        header(class: "container mx-auto px-5 py-4") do
           if Current.session
-            render Components::Button.new(variant: :secondary, href: session_path, method: :delete) { "Sign out" }
+            nav(class: "flex items-center justify-between") do
+              render Components::Link.new(href: imports_path) { "Imports" }
+              render Components::Button.new(variant: :secondary, href: session_path, method: :delete) { "Sign out" }
+            end
           end
         end
 

@@ -1,31 +1,25 @@
-# Files in the config/locales directory are used for internationalization and
-# are automatically loaded by Rails. If you want to use locales other than
-# English, add the necessary files in this directory.
-#
-# To use the locales, use `I18n.t`:
-#
-#     I18n.t "hello"
-#
-# In views, this is aliased to just `t`:
-#
-#     <%= t("hello") %>
-#
-# To use a different locale, set it with `I18n.locale`:
-#
-#     I18n.locale = :es
-#
-# This would use the information in config/locales/es.yml.
-#
-# To learn more about the API, please read the Rails Internationalization guide
-# at https://guides.rubyonrails.org/i18n.html.
-#
-# Be aware that YAML interprets the following case-insensitive strings as
-# booleans: `true`, `false`, `on`, `off`, `yes`, `no`. Therefore, these strings
-# must be quoted to be interpreted as strings. For example:
-#
-#     en:
-#       "yes": yup
-#       enabled: "ON"
-
 en:
-  hello: "Hello world"
+  activerecord:
+    errors:
+      models:
+        import:
+          attributes:
+            file:
+              format: "%{message}"
+              missing: "Select a CSV file."
+              nothing_new: "%{filename} contains nothing new."
+  imports:
+    destroy:
+      not_latest: "Only the latest import of an account can be deleted."
+  parsers:
+    errors:
+      missing_header: "The file is missing the DKB header block."
+      invalid_encoding: "The file is not valid UTF-8 text. Upload the CSV export unchanged."
+      account_line: "Line 1: expected the account type and IBAN."
+      balance_line: "Line 3: expected \"Kontostand vom DD.MM.YYYY:\"."
+      column_line: "Line 5: unexpected column headers. Only DKB account exports are supported."
+      field_count: "Line %{line}: expected %{expected} fields, got %{actual}."
+      unknown_status: "Line %{line}: unknown status \"%{status}\"."
+      malformed_line: "Line %{line}: %{details}"
+      unreadable_date: "Line %{line}: unreadable date \"%{value}\"."
+      unreadable_amount: "Line %{line}: unreadable amount \"%{value}\"."
