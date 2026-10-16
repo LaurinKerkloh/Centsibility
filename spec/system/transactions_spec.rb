@@ -25,6 +25,15 @@ RSpec.describe "Transactions" do
     expect(page).to have_field("Search", with: "")
   end
 
+  it "keeps each date picker from crossing the other", :aggregate_failures do
+    visit account_transactions_path(accounts.girokonto)
+    fill_in "From", with: Date.new(2026, 10, 1)
+    fill_in "To", with: Date.new(2026, 10, 5)
+
+    expect(find_field("To")[:min]).to eq("2026-10-01")
+    expect(find_field("From")[:max]).to eq("2026-10-05")
+  end
+
   it "shows the empty state when nothing matches" do
     visit account_transactions_path(accounts.girokonto)
     fill_in "From", with: Date.new(2027, 1, 1)

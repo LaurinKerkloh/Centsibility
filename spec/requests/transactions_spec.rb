@@ -27,7 +27,7 @@ RSpec.describe "Transactions" do
 
       it "renders the filter form, submitting into the list frame" do
         expect(response.body).to have_css("form[action='#{account_transactions_path(girokonto)}'][method='get']" \
-          "[data-controller='auto-submit'][data-turbo-frame='transactions_list'][data-turbo-action='advance']")
+          "[data-controller~='auto-submit'][data-controller~='date-range'][data-turbo-frame='transactions_list'][data-turbo-action='advance']")
       end
 
       it "renders the filters with plain param names", :aggregate_failures do
@@ -45,6 +45,13 @@ RSpec.describe "Transactions" do
       expect(response.body).to have_field("Search", with: "rewe")
       expect(response.body).to have_field("From", with: "2026-10-01")
       expect(response.body).to have_checked_field("Spending", visible: :all)
+    end
+
+    it "limits the date pickers to the other end of the range", :aggregate_failures do
+      get account_transactions_path(girokonto, from: "2026-10-01", to: "2026-10-05")
+
+      expect(response.body).to have_css("input#from[max='2026-10-05'][data-date-range-target='from']")
+      expect(response.body).to have_css("input#to[min='2026-10-01'][data-date-range-target='to']")
     end
 
     it "offers to clear the filters only when some are set", :aggregate_failures do
