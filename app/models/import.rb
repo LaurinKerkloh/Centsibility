@@ -12,6 +12,17 @@ class Import < ApplicationRecord
   validates :filename, presence: true
   validates :skipped_count, numericality: {only_integer: true, greater_than_or_equal_to: 0}
 
+  def self.from_file(file:)
+    import = new(filename: file.try(:original_filename))
+    return import.tap { it.errors.add(:file, "Select a CSV file.") } unless file.respond_to?(:read)
+
+    result = Importer.new(Parsers::Dkb.parse(file.read)).call(import:)
+    import.errors.add(:file, "#{import.filename} contains nothing new.") unless result.import
+    import
+  rescue Parsers::InvalidFile, ActiveRecord::RecordInvalid => error
+    import.tap { it.errors.add(:file, error.message) }
+  end
+
   def latest? = account.imports.maximum(:id) == id
 
   def revert!

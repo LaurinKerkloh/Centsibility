@@ -21,6 +21,47 @@ RSpec.describe Import do
     expect(accounts.girokonto.destroy).to be(false)
   end
 
+  describe ".from_file" do
+    let(:sample) { file_fixture("dkb/girokonto.csv").read }
+
+    def upload(content = sample, filename: "girokonto.csv")
+      Rack::Test::UploadedFile.new(StringIO.new(content), "text/csv", original_filename: filename)
+    end
+
+    def file_errors(file) = described_class.from_file(file:).errors[:file]
+
+    it "imports the file and returns the saved import", :aggregate_failures do
+      import = described_class.from_file(file: upload)
+
+      expect(import).to have_attributes(persisted?: true, filename: "girokonto.csv", account: accounts.girokonto)
+      expect(import.transactions).not_to be_empty
+    end
+
+    it "asks for a file when there is none" do
+      expect(file_errors(nil)).to eq(["Select a CSV file."])
+    end
+
+    it "reports a file that adds nothing new without saving an import", :aggregate_failures do
+      described_class.from_file(file: upload)
+
+      expect { expect(file_errors(upload)).to eq(["girokonto.csv contains nothing new."]) }.not_to change(described_class, :count)
+    end
+
+    it "reports parser errors" do
+      expect(file_errors(upload("not a bank export"))).to eq(["The file is missing the DKB header block."])
+    end
+
+    it "reports a file in the wrong encoding" do
+      expect(file_errors(upload("\"Gesch\xE4ftskonto\";\"DE45120300001234567890\"".b))).to contain_exactly(/not valid UTF-8/)
+    end
+
+    it "reports records that can't be saved and saves nothing", :aggregate_failures do
+      allow(Transaction).to receive(:new).and_wrap_original { |original, **attributes| original.call(**attributes, booked_on: nil) }
+
+      expect { expect(file_errors(upload)).to contain_exactly(/Validation failed/) }.not_to change(Transaction, :count)
+    end
+  end
+
   context "with imported statements" do
     let(:new_iban) { "DE08500105170007654321" }
 

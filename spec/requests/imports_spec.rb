@@ -75,14 +75,6 @@ RSpec.describe "Imports" do
       expect(flash[:notice]).to eq("Imported #{import.transactions.count} transactions.")
     end
 
-    it "records nothing and shows an error when the file adds nothing new", :aggregate_failures do
-      import_sample
-
-      expect { upload }.not_to change(Import, :count)
-      expect(response).to have_http_status(:unprocessable_content)
-      expect(response.body).to have_css("#import_file_errors", text: "girokonto.csv contains nothing new.")
-    end
-
     it "asks for a file when none was selected", :aggregate_failures do
       post imports_path
 
@@ -91,25 +83,11 @@ RSpec.describe "Imports" do
       expect(response.body).to have_css("#import_file_errors", text: "Select a CSV file.")
     end
 
-    it "shows the parser error for an invalid file", :aggregate_failures do
+    it "shows why an upload failed under the file field", :aggregate_failures do
       expect { upload("not a bank export") }.not_to change(Transaction, :count)
 
       expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to have_css("#import_file_errors", text: "The file is missing the DKB header block.")
-    end
-
-    it "shows the parser error for a file in the wrong encoding" do
-      upload("\"Gesch\xE4ftskonto\";\"DE45120300001234567890\"".b)
-
-      expect(response.body).to have_css("#import_file_errors", text: "not valid UTF-8")
-    end
-
-    it "shows the error when a record can't be saved", :aggregate_failures do
-      allow(Transaction).to receive(:new).and_wrap_original { |original, **attributes| original.call(**attributes, booked_on: nil) }
-
-      expect { upload }.not_to change(Import, :count)
-      expect(response).to have_http_status(:unprocessable_content)
-      expect(response.body).to have_css("#import_file_errors", text: "Validation failed")
     end
   end
 

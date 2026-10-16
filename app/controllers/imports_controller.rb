@@ -9,15 +9,13 @@ class ImportsController < ApplicationController
   end
 
   def create
-    file = params.dig(:import, :file)
-    return render_upload_error("Select a CSV file.") unless file.respond_to?(:read)
+    import = Import.from_file(file: params.dig(:import, :file))
 
-    result = Importer.new(Parsers::Dkb.parse(file.read)).call(import: Import.new(filename: file.original_filename))
-    return render_upload_error("#{file.original_filename} contains nothing new.") unless result.import
-
-    redirect_to result.import, notice: "Imported #{helpers.pluralize(result.transactions.size, "transaction")}."
-  rescue Parsers::InvalidFile, ActiveRecord::RecordInvalid => error
-    render_upload_error(error.message)
+    if import.persisted?
+      redirect_to import, notice: "Imported #{helpers.pluralize(import.transactions.size, "transaction")}."
+    else
+      render Views::Imports::New.new(import:), status: :unprocessable_content
+    end
   end
 
   def show
@@ -32,13 +30,5 @@ class ImportsController < ApplicationController
 
     import.revert!
     redirect_to imports_path, notice: "Deleted the import of #{import.filename}."
-  end
-
-  private
-
-  def render_upload_error(message)
-    import = Import.new
-    import.errors.add(:file, message)
-    render Views::Imports::New.new(import:), status: :unprocessable_content
   end
 end
