@@ -65,6 +65,21 @@ RSpec.describe Account do
     end
   end
 
+  describe "#latest_balance" do
+    let(:girokonto) { accounts.girokonto }
+
+    it "returns the balance of the latest date, created last on that date", :aggregate_failures do
+      girokonto.balances.create!(recorded_on: Date.new(2026, 1, 1), amount: "5")
+      newer = girokonto.balances.create!(recorded_on: balances.girokonto_current.recorded_on, amount: "10")
+
+      expect(girokonto.latest_balance).to eq(newer)
+    end
+
+    it "returns nil without balances" do
+      expect(account.latest_balance).to be_nil
+    end
+  end
+
   it "cannot be deleted while it has transactions" do
     accounts.girokonto.balances.destroy_all
 
