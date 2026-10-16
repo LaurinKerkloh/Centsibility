@@ -34,7 +34,10 @@ class Components::Layout < Components::Base
         header(class: "container mx-auto px-5 py-4") do
           if Current.session
             nav(class: "flex items-center justify-between") do
-              render Components::Link.new(href: imports_path) { "Imports" }
+              div(class: "flex gap-6") do
+                render Components::Link.new(href: accounts_path) { "Accounts" }
+                render Components::Link.new(href: imports_path) { "Imports" }
+              end
               render Components::Button.new(variant: :secondary, href: session_path, method: :delete) { "Sign out" }
             end
           end

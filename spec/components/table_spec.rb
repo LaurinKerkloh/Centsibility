@@ -16,4 +16,19 @@ RSpec.describe Components::Table do
     expect(rendered).to have_css("tbody tr:first-child td", exact_text: "Paid")
     expect(rendered).to have_css("tbody tr:last-child td.text-right", exact_text: "1")
   end
+
+  it "passes attributes to the body, e.g. an id to append rows to" do
+    rendered = render(described_class.new([], headers: ["Name"], body: {id: "people", class: "text-muted"}))
+
+    expect(rendered).to have_css("tbody#people.divide-y.text-muted", visible: :all)
+  end
+
+  describe Components::Table::Rows do
+    it "renders only the rows, with the same cells as the table", :aggregate_failures do
+      rendered = render(described_class.new(%w[Paid])) { |rows, row| rows.cell(align: :right) { row } }
+
+      expect(rendered).to have_no_css("table, tbody")
+      expect(rendered).to have_css("body > tr > td.text-right", exact_text: "Paid")
+    end
+  end
 end

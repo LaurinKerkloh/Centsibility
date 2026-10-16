@@ -10,4 +10,6 @@ class Account < ApplicationRecord
 
   # Balances are append-only, so the latest one for a date is the current one.
   def balance_on(date) = balances.where(recorded_on: date).order(:id).last
+
+  def latest_balance = balances.order(:recorded_on, :id).last
 end
