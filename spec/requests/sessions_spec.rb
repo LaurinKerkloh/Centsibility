@@ -16,9 +16,16 @@ RSpec.describe "Sessions" do
 
   it "shows the sign-out button on public pages when signed in" do
     sign_in_as users.user
-    get new_session_path
+    get new_password_path
 
     expect(response.body).to have_button("Sign out")
+  end
+
+  it "redirects to home when opening the login page while signed in" do
+    sign_in_as users.user
+    get new_session_path
+
+    expect(response).to redirect_to(root_path)
   end
 
   it "signs in and returns to the requested page", :aggregate_failures do
