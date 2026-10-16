@@ -16,31 +16,33 @@ class Views::Transactions::Index < Views::Base
       h1(class: "text-2xl font-bold") { @account.name }
 
       filters
-      turbo_frame_tag("transactions_list") { list }
+      turbo_frame_tag("transactions_list", class: "block space-y-4") { list }
     end
   end
 
   private
 
   def filters
-    div(class: "flex flex-wrap items-end gap-4") do
-      render Components::Form.new(model: @filter, scope: "", url: account_transactions_path(@account), method: :get,
-        class!: "flex flex-wrap items-end gap-4",
-        data: {controller: "auto-submit", turbo_frame: "transactions_list", turbo_action: "advance"}) do |form|
-        form.search_field :q, label: "Search", data: {action: "auto-submit#debounce"}
-        form.date_field :from, label: "From"
-        form.date_field :to, label: "To"
-        form.radio_group :direction, DIRECTIONS, label: "Direction"
-      end
-
-      if @filter.any?
-        render Components::Link.new(href: account_transactions_path(@account), class: "py-2 text-sm",
-          data: {turbo_frame: "_top"}) { "Clear filters" }
-      end
+    render Components::Form.new(model: @filter, scope: "", url: account_transactions_path(@account), method: :get,
+      class!: "flex flex-wrap items-end gap-4",
+      data: {controller: "auto-submit", turbo_frame: "transactions_list", turbo_action: "advance"}) do |form|
+      form.search_field :q, label: "Search", data: {action: "auto-submit#debounce"}
+      form.date_field :from, label: "From"
+      form.date_field :to, label: "To"
+      form.radio_group :direction, DIRECTIONS, label: "Direction"
     end
   end
 
+  # Inside the frame, so it shows up and goes away as the filters change. It leaves the frame to reset the form too.
+  def clear_filters
+    return unless @filter.any?
+
+    render Components::Link.new(href: account_transactions_path(@account), class: "text-sm",
+      data: {turbo_frame: "_top"}) { "Clear filters" }
+  end
+
   def list
+    clear_filters
     transactions = @filter.transactions
     return p(class: "text-muted") { empty_message } if transactions.empty?
 
