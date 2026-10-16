@@ -5,12 +5,16 @@ class Transaction::Filter
   PER_PAGE = 50
   DIRECTIONS = %w[income spending].freeze
 
-  attribute :account
+  attribute :account_id, :integer
   attribute :q, :string
   attribute :from, :date
   attribute :to, :date
   attribute :direction, :string
   attribute :page, :integer
+
+  def account
+    @account ||= Account.find(account_id)
+  end
 
   def transactions = batch.first(PER_PAGE)
 

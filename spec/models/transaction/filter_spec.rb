@@ -1,11 +1,21 @@
 RSpec.describe Transaction::Filter do
   let(:girokonto) { accounts.girokonto }
 
-  def filter(**params) = described_class.new(account: girokonto, **params)
+  def filter(**params) = described_class.new(account_id: girokonto.id, **params)
 
   def create_transaction(booked_on: "2026-10-15", amount: "-1", reference: nil, counterparty: nil, account: girokonto)
     account.transactions.create!(booked_on:, value_on: booked_on, amount:, reference:, counterparty:,
       raw_row: SecureRandom.hex)
+  end
+
+  describe "#account" do
+    it "finds the account by its id" do
+      expect(filter.account).to eq(girokonto)
+    end
+
+    it "raises for an unknown account" do
+      expect { described_class.new(account_id: 0).account }.to raise_error(ActiveRecord::RecordNotFound)
+    end
   end
 
   describe "#transactions" do
