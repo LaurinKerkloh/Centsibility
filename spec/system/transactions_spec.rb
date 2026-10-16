@@ -1,12 +1,13 @@
 RSpec.describe "Transactions" do
   before { sign_in_as users.user }
 
-  it "loads further pages while scrolling" do
+  it "loads further pages while scrolling until the end of the list", :aggregate_failures do
     stub_const("Transaction::Filter::PER_PAGE", 2)
     click_link "Accounts"
     click_link "Girokonto"
 
     expect(page).to have_css("tbody tr", count: 5)
+    expect(page).to have_text("No more transactions.")
   end
 
   it "filters live, keeps the URL in sync and clears the filters", :aggregate_failures do

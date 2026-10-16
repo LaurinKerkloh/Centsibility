@@ -16,6 +16,8 @@ class Transaction::Filter
 
   def next_page = (page_number + 1 if batch.size > PER_PAGE)
 
+  def first_page? = page_number == 1
+
   def any? = to_params.any?
 
   def to_params

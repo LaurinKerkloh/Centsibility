@@ -77,6 +77,12 @@ RSpec.describe Transaction::Filter do
     it "treats pages below 1 as the first" do
       expect(filter(page: "0").transactions.first).to eq(transactions.direct_debit)
     end
+
+    it "tells whether it is on the first page", :aggregate_failures do
+      expect(filter.first_page?).to be(true)
+      expect(filter(page: "0").first_page?).to be(true)
+      expect(filter(page: "2").first_page?).to be(false)
+    end
   end
 
   describe "#any?" do

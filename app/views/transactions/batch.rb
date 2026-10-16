@@ -9,11 +9,6 @@ class Views::Transactions::Batch < Components::Base
 
   def view_template
     turbo_stream.append("transactions") { render Components::Table::Rows.new(@filter.transactions), &method(:cells) }
-
-    if @filter.next_page
-      turbo_stream.replace(Views::Transactions::More::ID) { render Views::Transactions::More.new(@filter) }
-    else
-      turbo_stream.remove(Views::Transactions::More::ID)
-    end
+    turbo_stream.replace(Views::Transactions::More::ID) { render Views::Transactions::More.new(@filter) }
   end
 end

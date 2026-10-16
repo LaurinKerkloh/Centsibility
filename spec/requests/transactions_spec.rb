@@ -111,11 +111,18 @@ RSpec.describe "Transactions" do
           .and include(account_transactions_path(girokonto, page: 3, format: :turbo_stream))
       end
 
-      it "removes the sentinel with the last page" do
+      it "replaces the sentinel with the end of the list on the last page", :aggregate_failures do
         get account_transactions_path(girokonto, page: 3, format: :turbo_stream)
 
-        expect(response.body).to have_css("turbo-stream[action='remove'][target='transactions_more']", visible: :all)
+        expect(response.body).to have_css("turbo-stream[action='replace'][target='transactions_more']", visible: :all)
+        expect(response.body).to include("No more transactions.").and exclude("infinite-scroll")
       end
+    end
+
+    it "does not mark the end of a list that fits into one batch" do
+      get account_transactions_path(girokonto)
+
+      expect(response.body).to have_no_text("No more transactions.")
     end
   end
 end
