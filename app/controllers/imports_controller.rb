@@ -1,11 +1,16 @@
 class ImportsController < ApplicationController
   def index
-    render_index
+    imports = Import.with_new_count.includes(:account).order(created_at: :desc).load
+    render Views::Imports::Index.new(imports:)
+  end
+
+  def new
+    render Views::Imports::New.new(import: Import.new)
   end
 
   def create
     file = params.dig(:import, :file)
-    return render_index(error: "Select a CSV file.") unless file.respond_to?(:read)
+    return render_upload_error("Select a CSV file.") unless file.respond_to?(:read)
 
     result = Importer.new(Parsers::Dkb.parse(file.read)).call(import: Import.new(filename: file.original_filename))
     if result.import
@@ -14,7 +19,7 @@ class ImportsController < ApplicationController
       redirect_to imports_path, notice: "Nothing new in #{file.original_filename}."
     end
   rescue Parsers::InvalidFile, ActiveRecord::RecordInvalid => error
-    render_index(error: error.message)
+    render_upload_error(error.message)
   end
 
   def show
@@ -33,10 +38,9 @@ class ImportsController < ApplicationController
 
   private
 
-  def render_index(error: nil)
+  def render_upload_error(message)
     import = Import.new
-    import.errors.add(:file, error) if error
-    imports = Import.with_new_count.includes(:account).order(created_at: :desc).load
-    render Views::Imports::Index.new(import:, imports:), status: error ? :unprocessable_content : :ok
+    import.errors.add(:file, message)
+    render Views::Imports::New.new(import:), status: :unprocessable_content
   end
 end

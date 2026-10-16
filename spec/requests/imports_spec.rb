@@ -24,11 +24,12 @@ RSpec.describe "Imports" do
   end
 
   describe "GET /imports" do
-    it "shows the upload form", :aggregate_failures do
+    it "links to the upload page instead of showing the form", :aggregate_failures do
       get imports_path
 
       expect(response.body).to have_title("Imports")
-      expect(response.body).to have_css("form[action='/imports'][enctype='multipart/form-data'] input[type='file'][name='import[file]'][accept='.csv,text/csv']")
+      expect(response.body).to have_link("New import", href: "/imports/new")
+      expect(response.body).to have_no_css("main form")
     end
 
     context "with imports" do
@@ -55,6 +56,16 @@ RSpec.describe "Imports" do
     end
   end
 
+  describe "GET /imports/new" do
+    it "shows only the upload form", :aggregate_failures do
+      get new_import_path
+
+      expect(response.body).to have_title("New import")
+      expect(response.body).to have_css("main form[action='/imports'][enctype='multipart/form-data'] input[type='file'][name='import[file]'][accept='.csv,text/csv']")
+      expect(response.body).to have_no_css("main table")
+    end
+  end
+
   describe "POST /imports" do
     it "imports the file and redirects to the import", :aggregate_failures do
       expect { upload }.to change(Import, :count).by(1)
@@ -76,6 +87,7 @@ RSpec.describe "Imports" do
       post imports_path
 
       expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to have_title("New import")
       expect(response.body).to have_css("#import_file_errors", text: "Select a CSV file.")
     end
 

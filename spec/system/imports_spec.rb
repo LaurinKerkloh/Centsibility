@@ -6,6 +6,7 @@ RSpec.describe "Imports" do
   it "uploads a DKB export, shows what it added and deletes it again", :aggregate_failures do
     sign_in_as users.user
     click_link "Imports"
+    click_link "New import"
     attach_file "CSV file", file_fixture("dkb/girokonto.csv")
     click_button "Import"
 
@@ -24,7 +25,7 @@ RSpec.describe "Imports" do
 
   it "shows the error under the file field for an invalid file" do
     sign_in_as users.user
-    visit imports_path
+    visit new_import_path
     attach_file "CSV file", truncated_export.path
     click_button "Import"
 

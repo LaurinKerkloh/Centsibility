@@ -1,6 +1,5 @@
 class Views::Imports::Index < Views::Base
-  def initialize(import:, imports:)
-    @import = import
+  def initialize(imports:)
     @imports = imports
   end
 
@@ -8,11 +7,9 @@ class Views::Imports::Index < Views::Base
 
   def view_template
     div(class: "w-full space-y-10") do
-      h1(class: "text-2xl font-bold") { "Imports" }
-
-      render Components::Form.new(model: @import, url: imports_path, class: "max-w-sm") do |form|
-        form.file_field :file, label: "CSV file", accept: ".csv,text/csv", required: true
-        form.submit "Import"
+      div(class: "flex items-center justify-between gap-4") do
+        h1(class: "text-2xl font-bold") { "Imports" }
+        render Components::Button.new(href: new_import_path) { "New import" }
       end
 
       history
