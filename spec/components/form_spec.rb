@@ -28,6 +28,8 @@ RSpec.describe Components::Form do
         form.text_field :name, label: "Name"
         form.email_field :email, label: "Email"
         form.number_field :amount, label: "Amount"
+        form.search_field :q, label: "Search"
+        form.date_field :from, label: "From"
         form.select :kind, [["Income", "income"], ["Spending", "spending"]], label: "Kind"
       end
     end
@@ -36,6 +38,8 @@ RSpec.describe Components::Form do
       expect(rendered).to have_field("Name", type: "text")
       expect(rendered).to have_field("Email", type: "email")
       expect(rendered).to have_field("Amount", type: "number")
+      expect(rendered).to have_field("Search", type: "search")
+      expect(rendered).to have_field("From", type: "date")
     end
 
     it "renders the select with its choices" do
@@ -63,6 +67,40 @@ RSpec.describe Components::Form do
     rendered = render(described_class.new(url: "/rules", class: "mt-4")) { |form| form.submit "Save" }
 
     expect(rendered).to have_css("form.space-y-5.mt-4")
+  end
+
+  it "replaces its own classes with class!" do
+    rendered = render(described_class.new(url: "/rules", class!: "flex")) { |form| form.submit "Save" }
+
+    expect(rendered).to have_css("form[class='flex']")
+  end
+
+  describe "#radio_group" do
+    let(:choices) { [["All", ""], ["Income", "income"], ["Spending", "spending"]] }
+
+    def radio_group(direction: nil, **attributes)
+      filter = Transaction::Filter.new(direction:)
+      render(described_class.new(model: filter, scope: "", url: "/x")) do |form|
+        form.radio_group :direction, choices, label: "Direction", **attributes
+      end
+    end
+
+    it "renders a labelled group with a radio per choice", :aggregate_failures do
+      rendered = radio_group
+
+      expect(rendered).to have_css("fieldset legend", text: "Direction")
+      expect(rendered).to have_field("Income", type: "radio", visible: :all)
+      expect(rendered).to have_css("input[type='radio'][name='direction']", count: 3, visible: :all)
+    end
+
+    it "checks the choice matching the model's value, or the blank one without a value", :aggregate_failures do
+      expect(radio_group).to have_checked_field("All", visible: :all)
+      expect(radio_group(direction: "spending")).to have_checked_field("Spending", visible: :all)
+    end
+
+    it "passes extra attributes to every radio" do
+      expect(radio_group(data: {test: "x"})).to have_css("input[type='radio'][data-test='x']", count: 3, visible: :all)
+    end
   end
 
   it "renders the secondary submit variant" do

@@ -1,9 +1,10 @@
 class Components::Table < Components::Base
   CELL = "py-2 pr-4 last:pr-0"
 
-  def initialize(rows, headers:)
+  def initialize(rows, headers:, body_id: nil)
     @rows = rows
     @headers = headers
+    @body_id = body_id
   end
 
   def view_template(&row)
@@ -16,13 +17,7 @@ class Components::Table < Components::Base
         end
       end
 
-      tbody(class: "divide-y divide-border") do
-        @rows.each { |item| tr { row.call(self, item) } }
-      end
+      tbody(id: @body_id, class: "divide-y divide-border") { render Rows.new(@rows), &row }
     end
-  end
-
-  def cell(align: :left, **attributes, &)
-    td(**mix({class: "#{CELL} #{"text-right" if align == :right}"}, attributes), &)
   end
 end
