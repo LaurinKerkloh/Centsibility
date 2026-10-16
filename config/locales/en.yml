@@ -6,3 +6,20 @@ en:
           attributes:
             file:
               format: "%{message}"
+              missing: "Select a CSV file."
+              nothing_new: "%{filename} contains nothing new."
+  imports:
+    destroy:
+      not_latest: "Only the latest import of an account can be deleted."
+  parsers:
+    errors:
+      missing_header: "The file is missing the DKB header block."
+      invalid_encoding: "The file is not valid UTF-8 text. Upload the CSV export unchanged."
+      account_line: "Line 1: expected the account type and IBAN."
+      balance_line: "Line 3: expected \"Kontostand vom DD.MM.YYYY:\"."
+      column_line: "Line 5: unexpected column headers. Only DKB account exports are supported."
+      field_count: "Line %{line}: expected %{expected} fields, got %{actual}."
+      unknown_status: "Line %{line}: unknown status \"%{status}\"."
+      malformed_line: "Line %{line}: %{details}"
+      unreadable_date: "Line %{line}: unreadable date \"%{value}\"."
+      unreadable_amount: "Line %{line}: unreadable amount \"%{value}\"."

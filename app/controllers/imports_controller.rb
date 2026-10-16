@@ -26,7 +26,7 @@ class ImportsController < ApplicationController
 
   def destroy
     import = Import.find(params[:id])
-    return redirect_to import, alert: "Only the latest import of an account can be deleted." unless import.latest?
+    return redirect_to import, alert: t(".not_latest") unless import.latest?
 
     import.revert!
     redirect_to imports_path, notice: "Deleted the import of #{import.filename}."

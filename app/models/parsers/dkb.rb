@@ -25,7 +25,7 @@ module Parsers
 
     def parse
       lines = utf8_lines
-      raise InvalidFile, "The file is missing the DKB header block." if lines.size < HEADER_LINES
+      raise InvalidFile, :missing_header if lines.size < HEADER_LINES
 
       account_type, account_iban = account_line(lines[0])
       balance_on, balance = balance_line(lines[2])
@@ -42,21 +42,21 @@ module Parsers
 
     def utf8_lines
       content = @content.dup.force_encoding(Encoding::UTF_8)
-      raise InvalidFile, "The file is not valid UTF-8 text. Upload the CSV export unchanged." unless content.valid_encoding?
+      raise InvalidFile, :invalid_encoding unless content.valid_encoding?
 
       content.delete_prefix("\uFEFF").each_line(chomp: true).to_a
     end
 
     def account_line(line)
       fields = fields(line, 1)
-      raise InvalidFile, "Line 1: expected the account type and IBAN." unless fields.size == 2 && fields.all?(&:present?)
+      raise InvalidFile, :account_line unless fields.size == 2 && fields.all?(&:present?)
 
       fields
     end
 
     def balance_line(line)
       label, amount = fields(line, 3)
-      raise InvalidFile, "Line 3: expected \"Kontostand vom DD.MM.YYYY:\"." unless (match = BALANCE_LABEL.match(label))
+      raise InvalidFile, :balance_line unless (match = BALANCE_LABEL.match(label))
 
       [date(match[1], "%d.%m.%Y", 3), amount(amount.to_s.sub(/[[:space:]]*€\z/, ""), 3)]
     end
@@ -64,18 +64,18 @@ module Parsers
     def column_line(line)
       return if fields(line, 5) == COLUMNS
 
-      raise InvalidFile, "Line 5: unexpected column headers. Only DKB account exports are supported."
+      raise InvalidFile, :column_line
     end
 
     def entry(line, number)
       fields = fields(line, number)
-      raise InvalidFile, "Line #{number}: expected #{COLUMNS.size} fields, got #{fields.size}." unless fields.size == COLUMNS.size
+      raise InvalidFile.new(:field_count, line: number, expected: COLUMNS.size, actual: fields.size) unless fields.size == COLUMNS.size
 
       booked_on, value_on, status, payer, payee, reference, _type, iban, amount, creditor_id, mandate_reference,
         customer_reference = fields.map(&:presence)
 
       return if status == "Vorgemerkt"
-      raise InvalidFile, "Line #{number}: unknown status #{status.inspect}." unless status == "Gebucht"
+      raise InvalidFile.new(:unknown_status, line: number, status:) unless status == "Gebucht"
 
       amount = amount(amount, number)
       card = payer == CARD_ISSUER
@@ -94,11 +94,11 @@ module Parsers
     def fields(line, number)
       CSV.parse_line(line, col_sep: ";") || []
     rescue CSV::MalformedCSVError => error
-      raise InvalidFile, "Line #{number}: #{error.message}"
+      raise InvalidFile.new(:malformed_line, line: number, details: error.message)
     end
 
     def row_date(value, number)
-      raise InvalidFile, "Line #{number}: unreadable date #{value.inspect}." unless ROW_DATE.match?(value.to_s)
+      raise InvalidFile.new(:unreadable_date, line: number, value:) unless ROW_DATE.match?(value.to_s)
 
       date(value, "%d.%m.%y", number)
     end
@@ -106,11 +106,11 @@ module Parsers
     def date(value, format, number)
       Date.strptime(value, format)
     rescue Date::Error
-      raise InvalidFile, "Line #{number}: unreadable date #{value.inspect}."
+      raise InvalidFile.new(:unreadable_date, line: number, value:)
     end
 
     def amount(value, number)
-      raise InvalidFile, "Line #{number}: unreadable amount #{value.inspect}." unless AMOUNT.match?(value.to_s)
+      raise InvalidFile.new(:unreadable_amount, line: number, value:) unless AMOUNT.match?(value.to_s)
 
       BigDecimal(value.delete(".").tr(",", "."))
     end

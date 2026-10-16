@@ -14,10 +14,10 @@ class Import < ApplicationRecord
 
   def self.from_file(file:)
     import = new(filename: file.try(:original_filename))
-    return import.tap { it.errors.add(:file, "Select a CSV file.") } unless file.respond_to?(:read)
+    return import.tap { it.errors.add(:file, :missing) } unless file.respond_to?(:read)
 
     result = Importer.new(Parsers::Dkb.parse(file.read)).call(import:)
-    import.errors.add(:file, "#{import.filename} contains nothing new.") unless result.import
+    import.errors.add(:file, :nothing_new, filename: import.filename) unless result.import
     import
   rescue Parsers::InvalidFile, ActiveRecord::RecordInvalid => error
     import.tap { it.errors.add(:file, error.message) }
