@@ -29,8 +29,9 @@ class Views::Transactions::Index < Views::Base
       data: {controller: "auto-submit", turbo_frame: "transactions_list", turbo_action: "advance",
              action: "change->auto-submit#submit formdata->auto-submit#dropBlank"}) do |form|
       form.search_field :q, label: "Search", data: {action: "auto-submit#debounce"}
-      form.date_field :from, label: "From"
-      form.date_field :to, label: "To"
+      # Chrome fires change for every digit of the year, so dates wait like the search does.
+      form.date_field :from, label: "From", data: {action: "auto-submit#debounce:stop"}
+      form.date_field :to, label: "To", data: {action: "auto-submit#debounce:stop"}
       form.radio_group :direction, DIRECTIONS, label: "Direction"
     end
   end

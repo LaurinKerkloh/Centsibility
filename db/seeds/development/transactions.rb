@@ -1,4 +1,5 @@
-# Enough history to page through the transaction list. A fixed seed keeps it the same on every reset.
+# Enough history to page through the transaction list, always reaching up to today. The fixed seed keeps the mix
+# of counterparties and amounts the same on every reset.
 random = Random.new(42)
 payees = {
   counterparties.rewe => ["VISA Debitkartenumsatz", -80..-2],
