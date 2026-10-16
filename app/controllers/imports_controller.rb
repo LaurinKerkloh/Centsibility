@@ -13,11 +13,9 @@ class ImportsController < ApplicationController
     return render_upload_error("Select a CSV file.") unless file.respond_to?(:read)
 
     result = Importer.new(Parsers::Dkb.parse(file.read)).call(import: Import.new(filename: file.original_filename))
-    if result.import
-      redirect_to result.import, notice: "Imported #{helpers.pluralize(result.transactions.size, "transaction")}."
-    else
-      redirect_to imports_path, notice: "Nothing new in #{file.original_filename}."
-    end
+    return render_upload_error("#{file.original_filename} contains nothing new.") unless result.import
+
+    redirect_to result.import, notice: "Imported #{helpers.pluralize(result.transactions.size, "transaction")}."
   rescue Parsers::InvalidFile, ActiveRecord::RecordInvalid => error
     render_upload_error(error.message)
   end

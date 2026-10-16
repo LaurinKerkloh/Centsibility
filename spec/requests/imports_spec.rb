@@ -75,12 +75,12 @@ RSpec.describe "Imports" do
       expect(flash[:notice]).to eq("Imported #{import.transactions.count} transactions.")
     end
 
-    it "records nothing when the file adds nothing new", :aggregate_failures do
+    it "records nothing and shows an error when the file adds nothing new", :aggregate_failures do
       import_sample
 
       expect { upload }.not_to change(Import, :count)
-      expect(response).to redirect_to(imports_path)
-      expect(flash[:notice]).to eq("Nothing new in girokonto.csv.")
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to have_css("#import_file_errors", text: "girokonto.csv contains nothing new.")
     end
 
     it "asks for a file when none was selected", :aggregate_failures do
