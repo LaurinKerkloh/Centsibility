@@ -26,14 +26,7 @@ class Views::Accounts::Index < Views::Base
     render Components::Table.new(@accounts, headers: ["Name", "IBAN", ["Balance", :right]]) do |table, account|
       table.cell { render Components::Link.new(href: account_transactions_path(account)) { account.name } }
       table.cell(class: "whitespace-nowrap tabular-nums") { account.iban.scan(/.{1,4}/).join(" ") }
-      table.cell(align: :right) { balance(account.latest_balance) }
+      table.cell(align: :right) { render Components::Balance.new(account.latest_balance) }
     end
-  end
-
-  def balance(balance)
-    return span(class: "text-muted") { "None" } unless balance
-
-    render Components::Amount.new(balance.amount)
-    plain " on #{balance.recorded_on.to_fs(:de)}"
   end
 end

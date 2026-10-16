@@ -17,10 +17,10 @@ RSpec.describe Components::Table do
     expect(rendered).to have_css("tbody tr:last-child td.text-right", exact_text: "1")
   end
 
-  it "gives the body an id so rows can be appended to it" do
-    rendered = render(described_class.new([], headers: ["Name"], body_id: "people"))
+  it "passes attributes to the body, e.g. an id to append rows to" do
+    rendered = render(described_class.new([], headers: ["Name"], body: {id: "people", class: "text-muted"}))
 
-    expect(rendered).to have_css("tbody#people", visible: :all)
+    expect(rendered).to have_css("tbody#people.divide-y.text-muted", visible: :all)
   end
 
   describe Components::Table::Rows do

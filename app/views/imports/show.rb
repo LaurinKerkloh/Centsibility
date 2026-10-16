@@ -1,4 +1,6 @@
 class Views::Imports::Show < Views::Base
+  include Views::Transactions::Cells
+
   def initialize(import:, transactions:)
     @import = import
     @transactions = transactions
@@ -36,14 +38,7 @@ class Views::Imports::Show < Views::Base
       end
       item("New") { @transactions.size.to_s }
       item("Skipped") { @import.skipped_count.to_s }
-      item("Balance") do
-        if (balance = @import.balances.first)
-          render Components::Amount.new(balance.amount)
-          plain " on #{balance.recorded_on.to_fs(:de)}"
-        else
-          span(class: "text-muted") { "None" }
-        end
-      end
+      item("Balance") { render Components::Balance.new(@import.balances.first) }
     end
   end
 
@@ -55,12 +50,6 @@ class Views::Imports::Show < Views::Base
   def transaction_table
     return p(class: "text-muted") { "No new transactions." } if @transactions.empty?
 
-    headers = ["Booked on", "Counterparty", "Reference", ["Amount", :right]]
-    render Components::Table.new(@transactions, headers:) do |table, transaction|
-      table.cell(class: "whitespace-nowrap") { transaction.booked_on.to_fs(:de) }
-      table.cell { transaction.counterparty&.name }
-      table.cell(class: "text-muted") { transaction.reference }
-      table.cell(align: :right) { render Components::Amount.new(transaction.amount) }
-    end
+    render Components::Table.new(@transactions, headers: HEADERS), &method(:cells)
   end
 end

@@ -1,10 +1,10 @@
 class Components::Table < Components::Base
   CELL = "py-2 pr-4 last:pr-0"
 
-  def initialize(rows, headers:, body_id: nil)
+  def initialize(rows, headers:, body: {})
     @rows = rows
     @headers = headers
-    @body_id = body_id
+    @body = body
   end
 
   def view_template(&row)
@@ -17,7 +17,7 @@ class Components::Table < Components::Base
         end
       end
 
-      tbody(id: @body_id, class: "divide-y divide-border") { render Rows.new(@rows), &row }
+      tbody(**mix({class: "divide-y divide-border"}, @body)) { render Rows.new(@rows), &row }
     end
   end
 end

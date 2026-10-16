@@ -35,12 +35,7 @@ class Transaction::Filter
     scope = search(scope) if q.present?
     scope = scope.where(booked_on: from..) if from
     scope = scope.where(booked_on: ..to) if to
-
-    case direction
-    when "income" then scope.where(Transaction.arel_table[:amount].gt(0))
-    when "spending" then scope.where(Transaction.arel_table[:amount].lt(0))
-    else scope
-    end
+    DIRECTIONS.include?(direction) ? scope.public_send(direction) : scope
   end
 
   def search(scope)
@@ -51,5 +46,5 @@ class Transaction::Filter
     )
   end
 
-  def page_number = [page.to_i, 1].max
+  def page_number = [page || 1, 1].max
 end
