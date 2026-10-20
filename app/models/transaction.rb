@@ -4,6 +4,7 @@ class Transaction < ApplicationRecord
   belongs_to :account
   belongs_to :counterparty, optional: true
   belongs_to :import, optional: true
+  belongs_to :category, optional: true
 
   validates :booked_on, :value_on, :raw_row, presence: true
   validates :amount, numericality: true

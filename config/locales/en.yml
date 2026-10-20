@@ -2,6 +2,13 @@ en:
   activerecord:
     errors:
       models:
+        category:
+          in_use: "%{name} or one of its subcategories is still used by transactions."
+          attributes:
+            parent:
+              not_main: "has to be a main category"
+              self: "can't be the category itself"
+              has_subcategories: "can't be set for a category with subcategories"
         import:
           attributes:
             file:

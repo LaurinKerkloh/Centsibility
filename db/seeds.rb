@@ -1,1 +1,1 @@
-Oaken.seed :users, :counterparties, :accounts, :transactions
+Oaken.seed :users, :counterparties, :categories, :accounts, :transactions
