@@ -20,11 +20,12 @@ RSpec.describe Components::Layout do
     expect(rendered).to have_css("header form[action='/session'] button.border-border", text: "Sign out")
   end
 
-  it "links to the accounts and imports in the header when signed in", :aggregate_failures do
+  it "links to the accounts, imports and categories in the header when signed in", :aggregate_failures do
     signed_in = Current.set(session: users.user.sessions.create!) { render(described_class.new(title: "Home")) }
 
     expect(signed_in).to have_css("header nav a[href='/accounts']", text: "Accounts")
     expect(signed_in).to have_css("header nav a[href='/imports']", text: "Imports")
+    expect(signed_in).to have_css("header nav a[href='/categories']", text: "Categories")
   end
 
   it "hides the links when signed out", :aggregate_failures do

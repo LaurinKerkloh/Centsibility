@@ -22,7 +22,7 @@ RSpec.describe "Transactions" do
       it "lists the account's transactions newest first inside the list frame", :aggregate_failures do
         expect(response.body).to have_css("turbo-frame#transactions_list tbody#transactions tr", count: 5)
         expect(response.body).to have_css("tbody tr:first-child",
-          exact_text: /14.10.2026\s*Muster Versicherung AG\s*Haftpflicht 10\/2026 Vertrag 1234567\s*-6,90 €/)
+          exact_text: /14.10.2026\s*Muster Versicherung AG\s*Haftpflicht 10\/2026 Vertrag 1234567\s*Insurance › Liability\s*-6,90 €/)
       end
 
       it "renders the filter form, submitting into the list frame" do
@@ -35,6 +35,16 @@ RSpec.describe "Transactions" do
         expect(response.body).to have_field("From", type: "date", name: "from")
         expect(response.body).to have_field("To", type: "date", name: "to")
         expect(response.body).to have_checked_field("All", name: "direction", visible: :all)
+        expect(response.body).to have_select("Category", name: "category", selected: "All categories")
+      end
+
+      it "offers every category in tree order after all and uncategorised" do
+        expect(response.body).to have_select("Category",
+          options: ["All categories", "Uncategorised", *Category.in_tree_order.map(&:path)])
+      end
+
+      it "shows each transaction's category as a badge" do
+        expect(response.body).to have_css("tbody tr:first-child span.text-category-teal", exact_text: "Insurance › Liability")
       end
     end
 
@@ -45,6 +55,21 @@ RSpec.describe "Transactions" do
       expect(response.body).to have_field("Search", with: "rewe")
       expect(response.body).to have_field("From", with: "2026-10-01")
       expect(response.body).to have_checked_field("Spending", visible: :all)
+    end
+
+    it "filters by category and keeps it selected", :aggregate_failures do
+      get account_transactions_path(girokonto, category: categories.food.id)
+
+      expect(response.body).to have_css("tbody tr", count: 1, text: "REWE")
+      expect(response.body).to have_select("Category", selected: "Food")
+    end
+
+    it "shows a dash for uncategorised transactions" do
+      transactions.salary.update!(category: nil)
+
+      get account_transactions_path(girokonto, category: "none")
+
+      expect(response.body).to have_css("tbody tr td.text-muted", exact_text: "—")
     end
 
     it "limits the date pickers to the other end of the range", :aggregate_failures do

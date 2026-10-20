@@ -37,6 +37,7 @@ class Components::Layout < Components::Base
               div(class: "flex gap-6") do
                 render Components::Link.new(href: accounts_path) { "Accounts" }
                 render Components::Link.new(href: imports_path) { "Imports" }
+                render Components::Link.new(href: categories_path) { "Categories" }
               end
               render Components::Button.new(variant: :secondary, href: session_path, method: :delete) { "Sign out" }
             end

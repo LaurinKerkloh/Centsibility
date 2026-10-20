@@ -60,6 +60,22 @@ RSpec.describe Transaction::Filter do
       expect(filtered(direction: "anything").size).to eq(6)
     end
 
+    it "filters by category, including a main category's subcategories", :aggregate_failures do
+      expect(filtered(category: categories.groceries.id.to_s)).to eq([transactions.card_payment])
+      expect(filtered(category: categories.income.id.to_s)).to eq([transactions.salary])
+      expect(filtered(category: categories.savings.id.to_s)).to eq([transactions.savings_transfer])
+    end
+
+    it "filters for uncategorised transactions" do
+      uncategorised = create_transaction
+
+      expect(filtered(category: "none")).to eq([uncategorised])
+    end
+
+    it "ignores an unknown category" do
+      expect(filtered(category: "0").size).to eq(5)
+    end
+
     it "combines filters" do
       expect(filtered(q: "e", direction: "income", from: "2026-09-01")).to eq([transactions.salary])
     end
@@ -73,12 +89,22 @@ RSpec.describe Transaction::Filter do
       expect(described_class.new(direction: "income").any?).to be(true)
       expect(described_class.new(to: "2026-10-01").any?).to be(true)
     end
+
+    it "counts only a known category or none", :aggregate_failures do
+      expect(described_class.new(category: "none").any?).to be(true)
+      expect(described_class.new(category: "0").any?).to be(false)
+    end
   end
 
   describe "#to_params" do
     it "returns only the set filters" do
       expect(described_class.new(q: "rewe", from: "2026-10-01", to: "", direction: "spending").to_params)
         .to eq(q: "rewe", from: Date.new(2026, 10, 1), direction: "spending")
+    end
+
+    it "includes a known category or none", :aggregate_failures do
+      expect(described_class.new(category: categories.rent.id.to_s).to_params).to eq(category: categories.rent.id.to_s)
+      expect(described_class.new(category: "none").to_params).to eq(category: "none")
     end
   end
 end

@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   resource :session, only: %i[new create destroy]
   resources :passwords, param: :token, only: %i[new create edit update]
   resources :imports, only: %i[index new create show destroy]
+  resources :categories, except: :show
   resources :accounts, only: :index do
     resources :transactions, only: :index
   end

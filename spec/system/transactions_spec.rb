@@ -25,6 +25,14 @@ RSpec.describe "Transactions" do
     expect(page).to have_field("Search", with: "")
   end
 
+  it "filters live by category, including subcategories", :aggregate_failures do
+    visit account_transactions_path(accounts.girokonto)
+    select "Food", from: "Category"
+
+    expect(page).to have_css("tbody tr", count: 1, text: "REWE")
+    expect(page).to have_current_path("#{account_transactions_path(accounts.girokonto)}?category=#{categories.food.id}")
+  end
+
   it "keeps each date picker from crossing the other", :aggregate_failures do
     visit account_transactions_path(accounts.girokonto)
     fill_in "From", with: Date.new(2026, 10, 1)

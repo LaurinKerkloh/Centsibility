@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_15_115543) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_20_105051) do
   create_table "accounts", force: :cascade do |t|
     t.string "name", null: false
     t.string "iban", null: false
@@ -29,6 +29,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_15_115543) do
     t.integer "import_id"
     t.index ["account_id", "recorded_on"], name: "index_balances_on_account_id_and_recorded_on"
     t.index ["import_id"], name: "index_balances_on_import_id"
+  end
+
+  create_table "categories", force: :cascade do |t|
+    t.string "name", null: false
+    t.integer "parent_id"
+    t.string "color"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index "lower(name)", name: "index_categories_on_lower_name_for_main", unique: true, where: "parent_id IS NULL"
+    t.index "parent_id, lower(name)", name: "index_categories_on_parent_id_and_lower_name", unique: true
+    t.index ["parent_id"], name: "index_categories_on_parent_id"
   end
 
   create_table "counterparties", force: :cascade do |t|
@@ -75,8 +86,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_15_115543) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "import_id"
+    t.integer "category_id"
     t.index ["account_id", "booked_on"], name: "index_transactions_on_account_id_and_booked_on"
     t.index ["account_id", "raw_row"], name: "index_transactions_on_account_id_and_raw_row"
+    t.index ["category_id"], name: "index_transactions_on_category_id"
     t.index ["counterparty_id"], name: "index_transactions_on_counterparty_id"
     t.index ["import_id"], name: "index_transactions_on_import_id"
   end
@@ -91,10 +104,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_15_115543) do
 
   add_foreign_key "balances", "accounts"
   add_foreign_key "balances", "imports"
+  add_foreign_key "categories", "categories", column: "parent_id"
   add_foreign_key "counterparties", "imports", on_delete: :nullify
   add_foreign_key "imports", "accounts"
   add_foreign_key "sessions", "users"
   add_foreign_key "transactions", "accounts"
+  add_foreign_key "transactions", "categories"
   add_foreign_key "transactions", "counterparties"
   add_foreign_key "transactions", "imports"
 end

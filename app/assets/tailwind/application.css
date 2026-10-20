@@ -13,6 +13,18 @@
   --color-info: var(--color-sky-400);
   --color-success: var(--color-emerald-400);
   --color-warning: var(--color-amber-400);
+  --color-category-red: var(--color-red-400);
+  --color-category-orange: var(--color-orange-400);
+  --color-category-amber: var(--color-amber-400);
+  --color-category-yellow: var(--color-yellow-400);
+  --color-category-lime: var(--color-lime-400);
+  --color-category-green: var(--color-green-400);
+  --color-category-teal: var(--color-teal-400);
+  --color-category-cyan: var(--color-cyan-400);
+  --color-category-blue: var(--color-blue-400);
+  --color-category-violet: var(--color-violet-400);
+  --color-category-pink: var(--color-pink-400);
+  --color-category-gray: var(--color-gray-400);
 }
 
 @layer base {
