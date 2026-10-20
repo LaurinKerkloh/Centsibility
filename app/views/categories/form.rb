@@ -17,6 +17,9 @@ class Views::Categories::Form < Components::Base
       fieldset(data: {category_form_target: "color"}) do
         form.select :color, COLORS, label: "Colour", selected: @category.read_attribute(:color)
       end
+      p(class: "text-sm text-muted", hidden: true, data: {category_form_target: "inheritedColor"}) do
+        "Subcategories use the colour of their parent."
+      end
       form.submit "Save"
     end
   end

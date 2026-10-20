@@ -6,11 +6,15 @@ RSpec.describe "Categories" do
     click_link "New category"
     expect(page).to have_select("Colour")
 
+    expect(page).to have_no_text("Subcategories use the colour of their parent.")
+
     select "Health", from: "Parent"
     expect(page).to have_no_select("Colour")
+    expect(page).to have_text("Subcategories use the colour of their parent.")
 
     select "", from: "Parent"
     expect(page).to have_select("Colour")
+    expect(page).to have_no_text("Subcategories use the colour of their parent.")
 
     fill_in "Name", with: "Vet"
     select "Health", from: "Parent"
