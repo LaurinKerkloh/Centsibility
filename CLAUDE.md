@@ -22,7 +22,7 @@ Personal finance app: import bank CSV exports (DKB for now), categorise transact
 
 ## Workflow
 
-- Issues live in `LaurinKerkloh/banking`, grouped by milestones per phase.
+- Issues live in `LaurinKerkloh/Centsibility`, grouped by milestones per phase.
 - Labels: `needs-plan` → `planned`, plus `feature` / `infra` / `workflow`.
 - Flow: `/create-issue` → `/plan-issue` → `/implement-issue` → user merges → `/cleanup`
 - Each implementation runs in its own worktree, created with `EnterWorktree`.
