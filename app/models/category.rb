@@ -27,6 +27,8 @@ class Category < ApplicationRecord
 
   def possible_parents = Category.main.where.not(id:).alphabetical
 
+  def subcategories? = persisted? && subcategories.exists?
+
   def destroy_with_subcategories
     if Transaction.exists?(category_id: self_and_subcategory_ids)
       errors.add(:base, :in_use, name: path)
@@ -49,7 +51,7 @@ class Category < ApplicationRecord
       errors.add(:parent_id, :self)
     elsif parent.parent_id
       errors.add(:parent_id, :not_main)
-    elsif persisted? && subcategories.exists?
+    elsif subcategories?
       errors.add(:parent_id, :has_subcategories)
     end
   end

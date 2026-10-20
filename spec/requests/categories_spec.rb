@@ -90,11 +90,19 @@ RSpec.describe "Categories" do
 
   describe "GET /categories/:id/edit" do
     it "shows the form without the category itself as a parent", :aggregate_failures do
+      get edit_category_path(categories.savings)
+
+      expect(response.body).to have_title("Edit Savings")
+      expect(response.body).to have_field("Name", with: "Savings")
+      expect(response.body).to have_select("Parent", with_options: ["Living"])
+      expect(response.body).to have_no_select("Parent", with_options: ["Savings"])
+    end
+
+    it "offers no parent for a category with subcategories", :aggregate_failures do
       get edit_category_path(living)
 
-      expect(response.body).to have_title("Edit Living")
-      expect(response.body).to have_field("Name", with: "Living")
-      expect(response.body).to have_no_select("Parent", with_options: ["Living"])
+      expect(response.body).to have_no_select("Parent")
+      expect(response.body).to have_select("Colour", selected: "Orange")
     end
   end
 
@@ -107,11 +115,10 @@ RSpec.describe "Categories" do
     end
 
     it "shows the errors under the parent select", :aggregate_failures do
-      patch category_path(living), params: {category: {parent_id: categories.food.id}}
+      patch category_path(categories.savings), params: {category: {parent_id: categories.rent.id}}
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(response.body).to have_css("#category_parent_id_errors",
-        text: "Parent can't be set for a category with subcategories")
+      expect(response.body).to have_css("#category_parent_id_errors", text: "Parent has to be a main category")
     end
   end
 

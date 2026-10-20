@@ -32,9 +32,10 @@ RSpec.describe "Categories" do
     expect(categories.rent.reload.read_attribute(:color)).to eq("blue")
   end
 
-  it "preselects a category's own colour" do
+  it "shows the colour for a category with subcategories, which has no parent select", :aggregate_failures do
     visit edit_category_path(categories.living)
 
+    expect(page).to have_no_select("Parent")
     expect(page).to have_select("Colour", selected: "Orange")
   end
 

@@ -113,6 +113,14 @@ RSpec.describe Category do
     end
   end
 
+  describe "#subcategories?" do
+    it "is true only for a saved category with subcategories", :aggregate_failures do
+      expect(categories.living.subcategories?).to be(true)
+      expect(categories.savings.subcategories?).to be(false)
+      expect(described_class.new.subcategories?).to be(false)
+    end
+  end
+
   describe "#self_and_subcategory_ids" do
     it "includes the subcategories", :aggregate_failures do
       expect(living.self_and_subcategory_ids).to contain_exactly(living.id, *living.subcategories.ids)

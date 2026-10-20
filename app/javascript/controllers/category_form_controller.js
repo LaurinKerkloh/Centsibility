@@ -9,7 +9,7 @@ export default class extends Controller {
   }
 
   toggle() {
-    const hasParent = this.parentTarget.value !== ""
+    const hasParent = this.hasParentTarget && this.parentTarget.value !== ""
     this.colorTarget.hidden = hasParent
     this.colorTarget.disabled = hasParent
   }
