@@ -1,5 +1,8 @@
 en:
   activerecord:
+    attributes:
+      category:
+        color: "Colour"
     errors:
       models:
         category:

@@ -35,6 +35,7 @@ class Views::Transactions::Index < Views::Base
       form.date_field :to, label: "To", min: @filter.from,
         data: {date_range_target: "to", action: "change->date-range#sync change->auto-submit#debounce:stop"}
       form.radio_group :direction, DIRECTIONS, label: "Direction"
+      form.select :category, @filter.category_choices, label: "Category"
     end
   end
 
