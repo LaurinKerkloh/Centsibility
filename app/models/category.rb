@@ -13,12 +13,17 @@ class Category < ApplicationRecord
 
   def self.tree = main.includes(:subcategories).order(:name)
 
+  # Each main category followed by its subcategories.
+  def self.in_tree_order = tree.flat_map { [it, *it.subcategories] }
+
   # A subcategory's own colour is kept for when it becomes a main category again.
   def color = parent ? parent.color : super
 
   def path = parent ? "#{parent.name} › #{name}" : name
 
   def self_and_subcategory_ids = [id, *subcategory_ids]
+
+  def possible_parents = Category.main.where.not(id:).order(:name)
 
   def destroy_with_subcategories
     if Transaction.exists?(category_id: self_and_subcategory_ids)
@@ -27,7 +32,7 @@ class Category < ApplicationRecord
     end
 
     transaction do
-      subcategories.each(&:destroy!)
+      Category.where(parent_id: id).delete_all
       destroy!
     end
     true

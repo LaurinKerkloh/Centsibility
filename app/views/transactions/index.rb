@@ -35,7 +35,7 @@ class Views::Transactions::Index < Views::Base
       form.date_field :to, label: "To", min: @filter.from,
         data: {date_range_target: "to", action: "change->date-range#sync change->auto-submit#debounce:stop"}
       form.radio_group :direction, DIRECTIONS, label: "Direction"
-      form.select :category, @filter.category_choices, label: "Category"
+      form.select :category, category_choices, label: "Category"
     end
   end
 
@@ -53,6 +53,10 @@ class Views::Transactions::Index < Views::Base
 
     render Components::Table.new(@transactions_page.records, headers: HEADERS, body: {id: "transactions"}), &method(:cells)
     render Views::Transactions::More.new(account: @account, filter: @filter, transactions_page: @transactions_page)
+  end
+
+  def category_choices
+    [["All categories", ""], ["Uncategorised", "none"], *Category.in_tree_order.map { [it.path, it.id] }]
   end
 
   def empty_message = @filter.any? ? "No transactions match these filters." : "No transactions yet."

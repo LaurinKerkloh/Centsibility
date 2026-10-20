@@ -107,13 +107,4 @@ RSpec.describe Transaction::Filter do
       expect(described_class.new(category: "none").to_params).to eq(category: "none")
     end
   end
-
-  describe "#category_choices" do
-    it "offers all, uncategorised and every category by path in tree order" do
-      choices = described_class.new.category_choices
-
-      expect(choices.first(4)).to eq([["All categories", ""], ["Uncategorised", "none"],
-        ["Finance", categories.finance.id], ["Finance › Bank fees", categories.bank_fees.id]])
-    end
-  end
 end

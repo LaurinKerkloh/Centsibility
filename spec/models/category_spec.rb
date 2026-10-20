@@ -91,6 +91,20 @@ RSpec.describe Category do
     end
   end
 
+  describe ".in_tree_order" do
+    it "puts each main category before its subcategories" do
+      expect(described_class.in_tree_order.first(4).map(&:path))
+        .to eq(["Finance", "Finance › Bank fees", "Finance › Taxes", "Food"])
+    end
+  end
+
+  describe "#possible_parents" do
+    it "offers main categories other than the category itself", :aggregate_failures do
+      expect(categories.living.possible_parents).to include(categories.food).and exclude(categories.living, categories.rent)
+      expect(described_class.new.possible_parents).to include(categories.living)
+    end
+  end
+
   describe "#self_and_subcategory_ids" do
     it "includes the subcategories", :aggregate_failures do
       expect(living.self_and_subcategory_ids).to contain_exactly(living.id, *living.subcategories.ids)

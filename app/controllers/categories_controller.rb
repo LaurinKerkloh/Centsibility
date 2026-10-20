@@ -1,6 +1,6 @@
 class CategoriesController < ApplicationController
   def index
-    render Views::Categories::Index.new(categories: Category.tree)
+    render Views::Categories::Index.new(categories: Category.in_tree_order)
   end
 
   def new

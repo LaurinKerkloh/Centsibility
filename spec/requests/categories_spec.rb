@@ -19,15 +19,15 @@ RSpec.describe "Categories" do
     end
 
     it "lists main categories alphabetically, each followed by its subcategories", :aggregate_failures do
-      paths = Nokogiri::HTML(response.body).css("main li > span:first-child").map(&:text)
+      paths = Nokogiri::HTML(response.body).css("main tbody td:first-child span").map(&:text)
 
       expect(paths.first(4)).to eq(["Finance", "Finance › Bank fees", "Finance › Taxes", "Food"])
       expect(paths.size).to eq(Category.count)
     end
 
     it "indents subcategories and shows every category as a badge", :aggregate_failures do
-      expect(response.body).to have_css("li.pl-6 span.text-category-orange", exact_text: "Living › Rent")
-      expect(response.body).to have_css("li:not(.pl-6) span.text-category-orange", exact_text: "Living")
+      expect(response.body).to have_css("td.pl-6 span.text-category-orange", exact_text: "Living › Rent")
+      expect(response.body).to have_css("td:not(.pl-6) span.text-category-orange", exact_text: "Living")
     end
 
     it "offers to edit and delete each category", :aggregate_failures do

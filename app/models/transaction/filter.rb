@@ -28,11 +28,6 @@ class Transaction::Filter
      category: (category if category_ids)}.compact
   end
 
-  def category_choices
-    [["All categories", ""], ["Uncategorised", "none"],
-      *Category.tree.flat_map { |main| [main, *main.subcategories] }.map { [it.path, it.id] }]
-  end
-
   private
 
   # nil when no category, or an unknown one, is selected.
@@ -42,7 +37,7 @@ class Transaction::Filter
     @category_ids = if category == "none"
       [nil]
     elsif category.present?
-      Category.find_by(id: category)&.self_and_subcategory_ids
+      Category.where(id: category).or(Category.where(parent_id: category)).ids.presence
     end
   end
 

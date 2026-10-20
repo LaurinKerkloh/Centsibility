@@ -40,7 +40,7 @@ RSpec.describe "Transactions" do
 
       it "offers every category in tree order after all and uncategorised" do
         expect(response.body).to have_select("Category",
-          options: Transaction::Filter.new.category_choices.map(&:first))
+          options: ["All categories", "Uncategorised", *Category.in_tree_order.map(&:path)])
       end
 
       it "shows each transaction's category as a badge" do

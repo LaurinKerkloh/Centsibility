@@ -17,7 +17,7 @@ RSpec.describe "Categories" do
     click_button "Save"
 
     expect(page).to have_text("Created Vet.")
-    expect(page).to have_css("li span", exact_text: "Health › Vet")
+    expect(page).to have_css("td span", exact_text: "Health › Vet")
   end
 
   it "hides the colour when editing a subcategory" do
@@ -30,7 +30,7 @@ RSpec.describe "Categories" do
     visit categories_path
 
     accept_confirm("Delete Health and its subcategories?") do
-      within("li", text: /\AHealth\b/, match: :first) { click_button "Delete" }
+      within("tr", text: /\AHealth\b/, match: :first) { click_button "Delete" }
     end
 
     expect(page).to have_text("Deleted Health.")

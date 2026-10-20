@@ -20,7 +20,7 @@ class ImportsController < ApplicationController
 
   def show
     import = Import.includes(:account, :balances).find(params[:id])
-    transactions = import.transactions.includes(:counterparty, category: :parent).order(:booked_on, :id).load
+    transactions = import.transactions.for_list.order(:booked_on, :id).load
     render Views::Imports::Show.new(import:, transactions:)
   end
 
