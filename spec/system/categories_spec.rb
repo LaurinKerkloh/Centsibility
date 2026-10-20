@@ -20,10 +20,22 @@ RSpec.describe "Categories" do
     expect(page).to have_css("td span", exact_text: "Health › Vet")
   end
 
-  it "hides the colour when editing a subcategory" do
+  it "keeps a subcategory's own colour when it is saved", :aggregate_failures do
+    categories.rent.update!(color: "blue")
     visit edit_category_path(categories.rent)
-
     expect(page).to have_no_select("Colour")
+
+    fill_in "Name", with: "Rent & fees"
+    click_button "Save"
+
+    expect(page).to have_text("Updated Rent & fees.")
+    expect(categories.rent.reload.read_attribute(:color)).to eq("blue")
+  end
+
+  it "preselects a category's own colour" do
+    visit edit_category_path(categories.living)
+
+    expect(page).to have_select("Colour", selected: "Orange")
   end
 
   it "deletes a category after confirming" do

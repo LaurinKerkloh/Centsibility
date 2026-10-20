@@ -81,6 +81,14 @@ RSpec.describe Category do
     end
   end
 
+  describe ".alphabetical" do
+    it "sorts names case-insensitively" do
+      described_class.create!(name: "bike repairs", color: "red")
+
+      expect(described_class.main.alphabetical.first(2).map(&:name)).to eq(["bike repairs", "Finance"])
+    end
+  end
+
   describe ".tree" do
     it "lists main categories alphabetically with their subcategories alphabetically", :aggregate_failures do
       tree = described_class.tree

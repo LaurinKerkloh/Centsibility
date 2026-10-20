@@ -10,8 +10,9 @@ class Views::Categories::Form < Components::Base
       form.text_field :name, label: "Name", required: true
       form.select :parent_id, @category.possible_parents.map { [it.name, it.id] }, label: "Parent", include_blank: true,
         data: {category_form_target: "parent", action: "category-form#toggle"}
-      div(data: {category_form_target: "color"}) do
-        form.select :color, COLORS, label: "Colour"
+      # Disabled with the parent set, so a subcategory keeps its own colour.
+      fieldset(data: {category_form_target: "color"}) do
+        form.select :color, COLORS, label: "Colour", selected: @category.read_attribute(:color)
       end
       form.submit "Save"
     end

@@ -37,7 +37,7 @@ class Transaction::Filter
     @category_ids = if category == "none"
       [nil]
     elsif category.present?
-      Category.where(id: category).or(Category.where(parent_id: category)).ids.presence
+      Category.find_by(id: category)&.self_and_subcategory_ids
     end
   end
 

@@ -62,7 +62,7 @@ RSpec.describe "Categories" do
 
     it "wires the colour toggle", :aggregate_failures do
       expect(response.body).to have_css("form[data-controller='category-form'] select[data-category-form-target='parent']")
-      expect(response.body).to have_css("div[data-category-form-target='color'] select#category_color")
+      expect(response.body).to have_css("fieldset[data-category-form-target='color'] select#category_color")
     end
   end
 
