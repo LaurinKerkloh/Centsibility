@@ -106,10 +106,12 @@ RSpec.describe "Categories" do
       expect(categories.rent.reload.name).to eq("Rent & fees")
     end
 
-    it "shows the errors" do
+    it "shows the errors under the parent select", :aggregate_failures do
       patch category_path(living), params: {category: {parent_id: categories.food.id}}
 
       expect(response).to have_http_status(:unprocessable_content)
+      expect(response.body).to have_css("#category_parent_id_errors",
+        text: "Parent can't be set for a category with subcategories")
     end
   end
 

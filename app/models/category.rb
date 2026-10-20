@@ -46,11 +46,11 @@ class Category < ApplicationRecord
     return unless parent
 
     if parent == self
-      errors.add(:parent, :self)
+      errors.add(:parent_id, :self)
     elsif parent.parent_id
-      errors.add(:parent, :not_main)
+      errors.add(:parent_id, :not_main)
     elsif persisted? && subcategories.exists?
-      errors.add(:parent, :has_subcategories)
+      errors.add(:parent_id, :has_subcategories)
     end
   end
 end

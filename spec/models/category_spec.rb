@@ -34,21 +34,21 @@ RSpec.describe Category do
       category = build(parent: rent)
 
       expect(category).not_to be_valid
-      expect(category.errors).to be_of_kind(:parent, :not_main)
+      expect(category.errors).to be_of_kind(:parent_id, :not_main)
     end
 
     it "rejects the category as its own parent", :aggregate_failures do
       living.parent = living
 
       expect(living).not_to be_valid
-      expect(living.errors).to be_of_kind(:parent, :self)
+      expect(living.errors).to be_of_kind(:parent_id, :self)
     end
 
     it "rejects a parent for a category with subcategories", :aggregate_failures do
       living.parent = categories.food
 
       expect(living).not_to be_valid
-      expect(living.errors).to be_of_kind(:parent, :has_subcategories)
+      expect(living.errors).to be_of_kind(:parent_id, :has_subcategories)
     end
   end
 
