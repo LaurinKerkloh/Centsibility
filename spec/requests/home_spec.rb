@@ -4,7 +4,7 @@ RSpec.describe "Home" do
     get root_path
 
     expect(response).to have_http_status(:ok)
-    expect(response.body).to have_title("Centsibility", exact: true)
+    expect(response.body).to have_title("Tallune", exact: true)
     expect(response.body).to have_css("main h1", exact_text: "Home")
   end
 

@@ -1,6 +1,6 @@
-# Centsibility
+# Tallune
 
-Personal finance app: import bank CSV exports, categorise transactions by rules, and analyse income and spending. Single user, self-hosted.
+Tallune (from *tally*, via Latin *talea* "cut stick", and *lune*, via Latin *luna* "moon") is a personal finance app with a calm, uncluttered UI: import bank CSV exports, categorise transactions by rules, and analyse income and spending. Single user, self-hosted.
 
 ## The user
 
