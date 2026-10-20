@@ -1,4 +1,4 @@
-# Centsibility
+# Tallune
 
 Personal finance app: import bank CSV exports (DKB for now), categorise transactions by rules, and analyse income and spending. Single user, self-hosted.
 

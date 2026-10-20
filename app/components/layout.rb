@@ -17,7 +17,7 @@ class Components::Layout < Components::Base
         title { @title }
         meta(name: "viewport", content: "width=device-width,initial-scale=1")
         meta(name: "apple-mobile-web-app-capable", content: "yes")
-        meta(name: "application-name", content: "Centsibility")
+        meta(name: "application-name", content: "Tallune")
         meta(name: "mobile-web-app-capable", content: "yes")
         csrf_meta_tags
         csp_meta_tag
